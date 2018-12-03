@@ -1,0 +1,692 @@
+<!--
+Author: Shivam Sharma
+Learn Jinja Templating in Django before going to this code
+-->
+
+{% extends 'Login/header.html' %}
+{% block title %}MCGM Category List{% endblock %}
+{% block link %}{% url 'home' %} {% endblock %}
+{% block verified %}
+
+    <script>
+        $(document).ready(function () {
+            table = $('#outerTable').DataTable({
+                order: [[0, "asc"]],
+                "lengthMenu": [[10,15,50,100,-1], [10,15,50,100,"All"]],
+            });
+
+        });
+
+    </script>
+    <div align="center" id="tableDiv" style="width: 90%; margin:auto">
+        <table id="outerTable" class="table table-striped table-bordered" style="background: white;">
+            <thead>
+            <th>English Category</th>
+            <th>Marathi Category</th>
+            </thead>
+
+            <tbody>
+            <tr>
+                <td> Drainage chokes and blockages</td>
+                <td>गटार तुंबणे आणि साचणे</td>
+            </tr>
+            <tr>
+                <td> Overflowing drains or manholes</td>
+                <td>गटार किंवा मॅनहोल भरुन वाहणे</td>
+            </tr>
+            <tr>
+                <td>Replacement of missing/damaged manholes covers</td>
+                <td>तुटलेले/हरवलेले मॅनहोल झाकण बसविणे</td>
+            </tr>
+            <tr>
+                <td>Sunken manhole</td>
+                <td>मॅनहोल खचणे </td>
+            </tr>
+            <tr>
+                <td>Person falling in manhole</td>
+                <td> मॅनहोलमध्ये व्यक्ती पडणे</td>
+            </tr>
+            <tr>
+                <td>Outstanding dues pending</td>
+                <td>थकबाकी येणे बाकी</td>
+            </tr>
+            <tr>
+                <td>Cleaning of septic tank</td>
+                <td>संडासाची टाकी साफ करणे</td>
+            </tr>
+            <tr>
+                <td>Repairs to pipe sewers/main sewers</td>
+                <td>मलवाहिनी / मुख्य मलवाहिनी दुरुस्त करणे</td>
+            </tr>
+            <tr>
+                <td>Odour (foul smell) from drains</td>
+                <td>गटारातून घाण वास येणे</td>
+            </tr>
+            <tr>
+                <td>Bad patches/potholes on roads</td>
+                <td>रस्त्यावर खड्डे पडणे</td>
+            </tr>
+            <tr>
+                <td>Repairs/re-surfacing of roads/footpaths</td>
+                <td>रस्ता, फुटपाथ दुरुस्त/पुर्नबांधणी करणे</td>
+            </tr>
+            <tr>
+                <td>Removal of rank regulation on roads</td>
+                <td>रस्त्यावरील खुरटी झाडे-झुडपे काढून टाकणे</td>
+            </tr>
+            <tr>
+                <td>Reinstatement of trenches</td>
+                <td>चर बुजविणे</td>
+            </tr>
+            <tr>
+                <td>Unauthorised digging of road</td>
+                <td>अनधिकृत रस्ता खोदणे</td>
+            </tr>
+            <tr>
+                <td>Providing name plates to the road</td>
+                <td>रस्त्यांना नांव फलक पुरविणे</td>
+            </tr>
+            <tr>
+                <td>Street lighting</td>
+                <td>रस्त्यावरील दिवा बत्ती</td>
+            </tr>
+            <tr>
+                <td>Signals</td>
+                <td>सिग्नलबाबत तक्रारी</td>
+            </tr>
+            <tr>
+                <td>Speed breakers</td>
+                <td>गतिरोधक बसविणे</td>
+            </tr>
+            <tr>
+                <td>Permission for tree cutting</td>
+                <td>वृक्ष तोडण्यास परवानगीबाबत</td>
+            </tr>
+            <tr>
+                <td>Trimming of branches</td>
+                <td>वृक्ष छाटणीबाबत</td>
+            </tr>
+            <tr>
+                <td>Unauthorised Stalls on Roads</td>
+                <td>रस्त्यावरील असलेली अनधिकृत दुकाने</td>
+            </tr>
+            <tr>
+                <td>Fallen Tree on road</td>
+                <td>रस्त्यावर झाड पडणे</td>
+            </tr>
+            <tr>
+                <td>Bad Patches</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>Dangerous tree</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>Manhole</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>Flooding spot / Crosscut</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>Street furniture</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>Divider / Media</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>Unauthorised construction in slum</td>
+                <td>गलिच्छ वस्त्यांमधील अनधिकृत बांधकामे</td>
+            </tr>
+            <tr>
+                <td>Unauthorised repairs/renovations in slum</td>
+                <td>गलिच्छ वस्त्यांमधील अनधिकृत दुरूस्ती/नूतनीकरण</td>
+            </tr>
+            <tr>
+                <td>Delay in transfer case</td>
+                <td>हस्तांतरित प्रकरणांना विलंब होणे</td>
+            </tr>
+            <tr>
+                <td>Unauthorised extension/construction</td>
+                <td>अनधिकृत वाढीव कामे/बांधकामे</td>
+            </tr>
+            <tr>
+                <td>Unauthorised commercial activity</td>
+                <td>अनधिकृत व्यवसाय करणे</td>
+            </tr>
+            <tr>
+                <td>Legal</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>Issue of Birth / Death Certificate</td>
+                <td>जन्म/मृत्युचा दाखला देणे</td>
+            </tr>
+            <tr>
+                <td>Unauthorised Food Selling / Preparation</td>
+                <td>अनधिकृत खाद्य पदार्थ बनविणे/ विकणे</td>
+            </tr>
+            <tr>
+                <td>Unauthorized Flour Mill</td>
+                <td>अनधिकृत पिठाची गिरणी</td>
+            </tr>
+            <tr>
+                <td>Incorrect assessment of property</td>
+                <td>मालमत्तेच्या करनिर्धारणाबाबत विवाद</td>
+            </tr>
+            <tr>
+                <td>Non-availability of bills</td>
+                <td>मालमत्ता कराचे देयक प्राप्त झालेले नाही</td>
+            </tr>
+            <tr>
+                <td>Property Annexture, Transfer of Property, No Dues certificate, etc</td>
+                <td>मालमत्ता कराचे परिशिष्ट-अ, मालमत्तेचे हस्तांतरण तसेच थकित रक्कम शिल्लक नसल्याबाबतचे प्रमाणपत्र,इ</td>
+            </tr>
+            <tr>
+                <td>Receipt against Online payment</td>
+                <td>महाजालाद्वारे केलेल्या अधिदानाची पावती प्राप्त झाली नाही</td>
+            </tr>
+            <tr>
+                <td>Requirement to Assess the property</td>
+                <td>मालमत्तेचे करनिर्धारण करण्याबाबत</td>
+            </tr>
+            <tr>
+                <td>Searching the property details in absence of SACNo</td>
+                <td>15 अंकी मालमत्ता क्रमांक उपलब्ध नसल्यामुळे मालमत्तेचे तपशील प्राप्त होत नाही</td>
+            </tr>
+            <tr>
+                <td>Wrong billing name & address OR Wrong name of assessee</td>
+                <td>देयकावर दर्शविण्यात आलेल्या नाव / पत्त्यात तफावत असल्यास अथवा करदात्याचे नाव अचूक नाही</td>
+            </tr>
+            <tr>
+                <td>Wrong outstanding OR Payment related complaint</td>
+                <td>चुकीची थकबाकी अथवा देयक संकलनाबाबत तक्रार</td>
+            </tr>
+            <tr>
+                <td>Delay in refund</td>
+                <td>संकलनाच्या परताव्यासंबंधी विलंब</td>
+            </tr>
+            <tr>
+                <td>Contact List of Wards</td>
+                <td>विभाग कार्यालये व संबंधीत अधिका-यांचे संपर्क</td>
+            </tr>
+            <tr>
+                <td>Unauthorised construction/development</td>
+                <td>अनधिकृत बांधकामे</td>
+            </tr>
+            <tr>
+                <td>Unauthorised alteration/renovation of building, flat, tenement, etc.</td>
+                <td>इमारतीचे, सदनिकेचे,वसाहतींमध्ये अनधिकृतरित्या अंतर्गत बदल करणे</td>
+            </tr>
+            <tr>
+                <td>Permission for temporary monsoon shed</td>
+                <td>पावसाळी शेडसाठी तात्पुरती परवानगी</td>
+            </tr>
+            <tr>
+                <td>Regularisation of balcony enclosures</td>
+                <td>बाल्कनी संदर्भातील कामे नियमित करणे</td>
+            </tr>
+            <tr>
+                <td>Repairs permission for tolerated/censured unauthorised structures</td>
+                <td>अनधिकृत असतानाही परवानगी दिलेल्या अनधिकृत बांधकामाची दुरूस्ती</td>
+            </tr>
+            <tr>
+                <td>Granting authority u/s 499 of MMC Act for carrying out essential repairs</td>
+                <td>म. न. पा. कायदयामधील कलम 499 अन्वये दुरूस्तीबाबत परवानगी देण्याबाबतचे अधिकार</td>
+            </tr>
+            <tr>
+                <td>Heavy leakage from ceiling</td>
+                <td>छतामधुन मोठया प्रमाणात गळती</td>
+            </tr>
+            <tr>
+                <td>Change of user - Res to Commercial</td>
+                <td>वापरात बदल घरगुती ते व्यापारी</td>
+            </tr>
+            <tr>
+                <td>Establishment - Superio</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>Maintenance of municipal property, schools, dispensaries, maternity home, gardens</td>
+                <td>महापालिकेच्या मालमत्तांचे, शाळांचे, दवाखान्यांचे, प्रसुतीगृहांचे व उद्यानांचे परिरक्षण करणे</td>
+            </tr>
+            <tr>
+                <td>Maintenance of electric pumps in municipal colonies</td>
+                <td>पालिकेच्या वसाहितीतील विद्युत मोटारींचे परिरक्षण करणे</td>
+            </tr>
+            <tr>
+                <td>Protection of municipal play grounds/gardens</td>
+                <td>महापालिकेच्या मैदाने व उद्यानांचे संरक्षण करणे</td>
+            </tr>
+            <tr>
+                <td>Providing for monsoon to municipal property to avoid leakage</td>
+                <td>महापालिकेच्या मालमत्तेमध्ये पावसाळी पाण्याची गळती थांबविण्यासाठी शेडची व्यवस्था करणे</td>
+            </tr>
+            <tr>
+                <td>Providing/repairing doors, windows of P.S. Blocks</td>
+                <td>सार्वजनिक शौचालयांना दरवाजे, खिडक्या पुरविणे/दुरूस्त करणे</td>
+            </tr>
+            <tr>
+                <td>Proper electric supply to municipal properties</td>
+                <td>महापालिकेच्या मालकीच्या जागांवर व्यवस्थित विद्युत पुरवठा करणे</td>
+            </tr>
+            <tr>
+                <td>Major repairs to municipal property</td>
+                <td>महापालिकेच्या मालमत्तेची मोठी दुरूस्ती करणे</td>
+            </tr>
+            <tr>
+                <td>Minor repairs to municipal property</td>
+                <td>महापालिकेच्या मालमत्तेची किरकोळ दुरूस्ती करणे</td>
+            </tr>
+            <tr>
+                <td>Unauthorised stalls on roads, footpath or SWD drain</td>
+                <td>रस्ता, फुटपाथ किंवा गटारांवर असलेली अनधिकृत दुकाने</td>
+            </tr>
+            <tr>
+                <td>Unauthorised banners/advertisement/boards on roads/footpath</td>
+                <td>रस्ता/पदपथावरील अनधिकृत फलक/जाहिराती</td>
+            </tr>
+            <tr>
+                <td>Unauthorised storage of explosives</td>
+                <td>स्फोटकांचा अनधिकृत साठा</td>
+            </tr>
+            <tr>
+                <td>Trade without License</td>
+                <td>विनापरवाना व्यवसाय</td>
+            </tr>
+            <tr>
+                <td>Unauthorized workshop or Garage</td>
+                <td>अनधिकृत गॅरेज किंवा कार्यशाळा</td>
+            </tr>
+            <tr>
+                <td>Storage and sale of plastic bags</td>
+                <td>प्लास्टिकच्या पिशव्यांच्या साठा करणे व विकणे</td>
+            </tr>
+            <tr>
+                <td>Mosquito nuisance</td>
+                <td>मच्छरांचा उपद्रव</td>
+            </tr>
+            <tr>
+                <td>Rat nuisance</td>
+                <td>उंदरांचा उपद्रव</td>
+            </tr>
+            <tr>
+                <td>Fogging</td>
+                <td>धुम्र फवारणी</td>
+            </tr>
+            <tr>
+                <td>Nuisance due to white ants</td>
+                <td>वाळवीचा उपद्रव</td>
+            </tr>
+            <tr>
+                <td>Nuisance due to cockroaches</td>
+                <td>झुरळांचा उपद्रवे</td>
+            </tr>
+            <tr>
+                <td>Unauthorised/uncovered water storage tanks</td>
+                <td>अनधिकृत/ न झाकलेला पाण्याचा साठा</td>
+            </tr>
+            <tr>
+                <td>Short supply of water</td>
+                <td>पाण्याचा अपुरा पुरवठा</td>
+            </tr>
+            <tr>
+                <td>Choke in main drain</td>
+                <td>गटाराची मुख्य वाहिनी तुबंणे</td>
+            </tr>
+            <tr>
+                <td>Drinking Water not available</td>
+                <td>पिण्याचे पाणी उपलब्ध न होणे</td>
+            </tr>
+            <tr>
+                <td>Toilet not cleaned</td>
+                <td>मुतारी स्वच्छ नसणे</td>
+            </tr>
+            <tr>
+                <td>Door/Window/staircase etc. found broken.</td>
+                <td>दरवाजे/ खिडक्या/जिने तुटलेले असणे</td>
+            </tr>
+            <tr>
+                <td>No electricity supply</td>
+                <td>विजेचा पुरवठा नसणे</td>
+            </tr>
+            <tr>
+                <td>Lamp,tubelight etc. to be replaced</td>
+                <td>बल्ब, टयुब लाईट इ. बदली करणे</td>
+            </tr>
+            <tr>
+                <td>Furniture found broken in the classes.</td>
+                <td>वर्गातील लाकडी सामान तुटलेले आढळणे</td>
+            </tr>
+            <tr>
+                <td>Found encroachment in the school premise</td>
+                <td>शाळेच्या आवारात अतिक्रमण</td>
+            </tr>
+            <tr>
+                <td>No Teacher</td>
+                <td>शिक्षक नसणे</td>
+            </tr>
+            <tr>
+                <td>No warning/alarm system</td>
+                <td>पूर्व सूचना देणारी पध्दत नसणे</td>
+            </tr>
+            <tr>
+                <td>Overflow of waste material</td>
+                <td>कचरा तुडूंब भरून वाहणे</td>
+            </tr>
+            <tr>
+                <td>Pan/Gutka hawker near school premises</td>
+                <td>शाळेच्या आवाराजवळ पान/गुटखा फेरीवाले आढळणे</td>
+            </tr>
+            <tr>
+                <td>Bad Quality of material given to student</td>
+                <td>विद्यार्थ्यांना वाईट दर्जाचे सामान पुरविणे</td>
+            </tr>
+            <tr>
+                <td>Pension / Family Pension Not Started</td>
+                <td>निवृत्तीवेतन / कुटुंबनिवृत्तीवेतन सुरु करण्यात आलेले नाही</td>
+            </tr>
+            <tr>
+                <td>Current Month Pension / FP Not Received</td>
+                <td>चालू महिन्याचे निवृतीवेतन / कुटुंब निवृत्तीवेतन मिळालेले नाही</td>
+            </tr>
+            <tr>
+                <td>Arrears Of Pension / FP Not Received</td>
+                <td>निवृत्तीवेतनाची थकबाकी / कुटुंब निवृत्तीवेतनाची थकबाकी मिळालेली नाही</td>
+            </tr>
+            <tr>
+                <td>Gratuity Not Received</td>
+                <td>उपदान मिळालेले नाही</td>
+            </tr>
+            <tr>
+                <td>Commutation Of Pension Not Received</td>
+                <td>निवृत्तीवेतनाचे अंशराशीकरण मिळालेले नाही</td>
+            </tr>
+            <tr>
+                <td>Arrears Of Pension Benefits Due To Rev.</td>
+                <td>वेतन सुधारणेमुळे निवृत्तीवेतनादी फायदे </td>
+            </tr>
+            <tr>
+                <td>NCPF Not Received</td>
+                <td>अन-अंशदायी भविष्य निर्वाह निधी मिळालेला नाही</td>
+            </tr>
+            <tr>
+                <td>Leave Encashment Not Received</td>
+                <td>रजा रोखीची रक्कम मिळालेली नाही</td>
+            </tr>
+            <tr>
+                <td>Cleaning of water entrance</td>
+                <td>पर्जन्य जलमुखाची स्वच्छता करणे</td>
+            </tr>
+            <tr>
+                <td>Cleaning of open SWD</td>
+                <td>खुल्या पर्जन्य जलवाहिन्या साफ करणे</td>
+            </tr>
+            <tr>
+                <td>Flooding during monsoon</td>
+                <td>पावसाळयात पाणी तुंबणे</td>
+            </tr>
+            <tr>
+                <td>Pre-monsoon works halted</td>
+                <td>पावसाळापूर्व काम स्थगित होणे</td>
+            </tr>
+            <tr>
+                <td>Providing damaged/missing gratings manhole covers over SWD's</td>
+                <td>पर्जन्य जलवाहिन्यांवरील/ गटारांवरील तुटलेली/गहाळ झालेली झाकणे पुरविणे</td>
+            </tr>
+            <tr>
+                <td>Removal of silt from nalla/across culverts, etc.</td>
+                <td>नाल्यातील गाळ काढणे</td>
+            </tr>
+            <tr>
+                <td>Repair to damaged open SWD</td>
+                <td>खुल्या पर्जन्य जलवाहिन्या दुरुस्त करणे</td>
+            </tr>
+            <tr>
+                <td>Unauthorised Stalls and Huts on nallas</td>
+                <td>नाल्यावर असलेली अनधिकृत दुकाने आणि झोपडया</td>
+            </tr>
+            <tr>
+                <td>Raising of manhole (except in monsoon)</td>
+                <td>मॅनहोलची उंची वर उचलणे</td>
+            </tr>
+            <tr>
+                <td>Garbage not lifted from co-authorised collection point</td>
+                <td>एकत्रित केलेला कचरा नियोजित जागेवरुन न उचलणे</td>
+            </tr>
+            <tr>
+                <td>Garbage not lifted from house gully</td>
+                <td>घरगल्ल्यांमधून कचरा न उचलणे</td>
+            </tr>
+            <tr>
+                <td>Collection point not attended properly</td>
+                <td>जमा केलेला कचरा व्यवस्थित न उचलणे</td>
+            </tr>
+            <tr>
+                <td>Garbage not lifted from municipal market</td>
+                <td>म.न.पा. मंडईतून कचरा न उचलणे</td>
+            </tr>
+            <tr>
+                <td>Garbage lorry not reported for service</td>
+                <td>कचरागाडी सेवेसाठी न येणे</td>
+            </tr>
+            <tr>
+                <td>Garbage lorry not covered</td>
+                <td>कचरागाडी झाकलेली नाही</td>
+            </tr>
+            <tr>
+                <td>Providing/removing/replacing dustbins</td>
+                <td>कच-याचा डबा पुरविणे/काढणे/ बदलणे</td>
+            </tr>
+            <tr>
+                <td>Removal of dead animals</td>
+                <td>मृत जनावरे उचलणे</td>
+            </tr>
+            <tr>
+                <td>Sweeping of road</td>
+                <td>रस्ता झाडणे</td>
+            </tr>
+            <tr>
+                <td>Cleaning of P.S.C. block/channels</td>
+                <td>सार्वजनिक शौचालयांची स्वच्छता</td>
+            </tr>
+            <tr>
+                <td>No attendance at public toilets</td>
+                <td>सार्वजनिक स्वच्छता गृह दुर्लक्षित असणे</td>
+            </tr>
+            <tr>
+                <td>Removal of Debris</td>
+                <td>मातीचा ढिगारा उचलणे</td>
+            </tr>
+            <tr>
+                <td>Silt to be lifted on road</td>
+                <td>रस्त्यावरील गाळ उचलणे</td>
+            </tr>
+            <tr>
+                <td>Non attendant of Nuisance Detector</td>
+                <td>उपद्रव शोधक नसणे</td>
+            </tr>
+            <tr>
+                <td>Lifting of Tree Cutting</td>
+                <td>कापलेल्या झाडांच्या फांदया उचलणे</td>
+            </tr>
+            <tr>
+                <td>Nuisance due to masala mills</td>
+                <td>मसाला गिरणीचा उपद्रव</td>
+            </tr>
+            <tr>
+                <td>Air pollution</td>
+                <td>हवा प्रदूषण</td>
+            </tr>
+            <tr>
+                <td>Pollution due to chemical effluents</td>
+                <td>रासायनिक घटकांमुळे प्रदूषण</td>
+            </tr>
+            <tr>
+                <td>Unauthorised factory, workshop or garage</td>
+                <td>अनधिकृत कारखाने/कार्यशाळा/गॅरेज</td>
+            </tr>
+            <tr>
+                <td>Pertaining to rent</td>
+                <td>भाडयाशी संबधित तक्रारी</td>
+            </tr>
+            <tr>
+                <td>Transfer of tenancy</td>
+                <td>भाडोञी जागेचे हस्तांतरण</td>
+            </tr>
+            <tr>
+                <td>Unauthorised construction on the Plot/Room</td>
+                <td>प्लॉटवरील अनधिकृत बांधकाम</td>
+            </tr>
+            <tr>
+                <td>Unauthorised use of Room</td>
+                <td>खेालीचा अनधिकृत वापर</td>
+            </tr>
+            <tr>
+                <td>Non-maintenance of Premises</td>
+                <td>जागेचे परिरक्षण न करणे</td>
+            </tr>
+            <tr>
+                <td>Pending Transfer cases.</td>
+                <td>प्रलंबित हस्तांतरित प्रकरणे</td>
+            </tr>
+            <tr>
+                <td>Unauthorised addition/alteration in the premises</td>
+                <td>अनधिकृत वाढविणे/ बदल</td>
+            </tr>
+            <tr>
+                <td>Unauthorised materials/furniture found</td>
+                <td>अनधिकृत सामान/ फर्निचर साठवुन ठेवणे</td>
+            </tr>
+            <tr>
+                <td>Extension in the premises without permission</td>
+                <td>परवानगीशिवाय आवाराच्या जागेत विस्तार करणे</td>
+            </tr>
+            <tr>
+                <td>Slab fallen down.</td>
+                <td>छज्जा (स्लॅब) पडणे</td>
+            </tr>
+            <tr>
+                <td>Unauthorised shed on building in premises</td>
+                <td>इमारतीच्या आवारात अनधिकृत शेड बांधणे</td>
+            </tr>
+            <tr>
+                <td>Open beyond permissible hours</td>
+                <td>दुकाने परवानगी वेळे व्यतिरिक्त चालू ठेवणे</td>
+            </tr>
+            <tr>
+                <td>Running without licence</td>
+                <td>दुकाने विना परवाना चालू ठेवणे</td>
+            </tr>
+            <tr>
+                <td>Non observance of Holidays</td>
+                <td>सुट्टीचे पालन न करणे</td>
+            </tr>
+            <tr>
+                <td>Not providing minimum wages</td>
+                <td>किमान वेतन न देणे</td>
+            </tr>
+            <tr>
+                <td>Shop open on weekly holiday</td>
+                <td>आठवडा रजेच्या दिवशी दुकाने उघडी ठेवणे</td>
+            </tr>
+            <tr>
+                <td>Found staff working more than on muster</td>
+                <td>हजेरी पटावर जास्त कर्मचारी आढळणे</td>
+            </tr>
+            <tr>
+                <td>Employing children (below 14) in the org</td>
+                <td>14 वर्षाखालील मुलांना कामावर ठेवणे</td>
+            </tr>
+            <tr>
+                <td>Online Renewal Application</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>Municipal Land - Road / Footpath / Strom Water Drain</td>
+                <td>महापालिकेच्या जमीन-रस्ता, पदपथ, पर्जन्य जल वाहिनीवरील अतिक्रमणे</td>
+            </tr>
+            <tr>
+                <td>Municipal Plot</td>
+                <td>महापालिकेचा भूखंड</td>
+            </tr>
+            <tr>
+                <td>Municipal Colony / Slum</td>
+                <td>महापालिकेच्या वसाहत/गलिच्छ वस्त्यांमधील अतिक्रमणे</td>
+            </tr>
+            <tr>
+                <td>Hawkers</td>
+                <td>फेरीवाले</td>
+            </tr>
+            <tr>
+                <td>Private Land / Building / Society / Factories</td>
+                <td>खाजगी जमीन/इमारत/सोसायटी/कारखाने</td>
+            </tr>
+            <tr>
+                <td>Leaks in water lines</td>
+                <td>जलवाहिनीमध्ये गळती</td>
+            </tr>
+            <tr>
+                <td>Burst water main</td>
+                <td>जलवाहिनी फुटणे</td>
+            </tr>
+            <tr>
+                <td>Contaminated water supply</td>
+                <td>दुषित पाण्याचा पुरवठा</td>
+            </tr>
+            <tr>
+                <td>Shortage of water supply</td>
+                <td>पाण्याचा तुटवडा</td>
+            </tr>
+            <tr>
+                <td>Unauthorised tapping of water connections</td>
+                <td>पाण्याची अनधिकृत नळ जोडणी</td>
+            </tr>
+            <tr>
+                <td>Unauthorised use of water-Change of User</td>
+                <td>पाण्याचा अनधिकृत वापर</td>
+            </tr>
+            <tr>
+                <td>Use of booster pump</td>
+                <td>बुस्टर पंपाचा वापर</td>
+            </tr>
+            <tr>
+                <td>Removal of water meters</td>
+                <td>पाण्याचे मीटर काढून टाकणे</td>
+            </tr>
+            <tr>
+                <td>Providing water by tankers</td>
+                <td>टँकरने पाणी पुरवठा करणे</td>
+            </tr>
+            <tr>
+                <td>Water supply during non-supply hours</td>
+                <td>पाणी पुरवठयावेळे व्यतिरिक्त पाणी पुरवठा करणे</td>
+            </tr>
+            <tr>
+                <td>Leakage near meter</td>
+                <td>जलमापका जवळ होणारी पाणी गळती</td>
+            </tr>
+            <tr>
+                <td>Overflow of overhead tank / suction tank'</td>
+                <td>शोषण टाकी /गच्ची वरील टाकी भरून वाहते</td>
+            </tr>
+            <tr>
+                <td>Non receipt of water bills'</td>
+                <td>जल देयके न मिळण्या बाबत</td>
+            </tr>
+            <tr>
+                <td>Establishment - Labour</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>Office Superintendent</td>
+                <td></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

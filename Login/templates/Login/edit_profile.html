@@ -1,0 +1,45 @@
+<!--
+Author: Shivam Sharma
+Learn Jinja Templating in Django before going to this code
+-->
+
+{% extends 'Login/header.html' %}
+{% block title %}Edit Profile{% endblock %}
+{% block link %}{% url 'home' %} {% endblock %}
+{% block verified %}
+    <style>
+        input, select, textarea {
+            width: 100%; /* Full width */
+        }
+    </style>
+    {% if Flag == "success" %}
+        <div class="alert alert-success">
+            <strong>Success!</strong>
+            <p>{{ Message }}</p>
+        </div>
+    {% endif %}
+    <div class="container">
+        <label for="username">Username</label>
+        <input type="text" id="username" value="{{ UserName }}" readonly>
+
+        <label for="group">Group</label>
+        <input type="text" id="group" value="{{ Group }}" readonly>
+
+        <form action="" method="post">
+            {% csrf_token %}
+            <label for="fname">First Name</label>
+            <input type="text" id="fname" name="FirstName" value="{{ FirstName }}" required>
+
+            <label for="lname">Last Name</label>
+            <input type="text" id="lname" name="LastName" value="{{ LastName }}">
+
+            <label for="email">Email</label>
+            <input type="email" id="email" name="Email" value="{{ Email }}" required/> <br>
+            <div align="center">
+                <button type="submit">Update</button>
+            </div>
+        </form>
+    </div>
+{% endblock %}
+
+

@@ -1,0 +1,11 @@
+<!--
+Author: Shivam Sharma
+Learn Jinja Templating in Django before going to this code
+-->
+
+{% extends 'Login/header.html' %}
+{% block title %}Home{% endblock %}
+{% block link %}{% url 'home' %} {% endblock %}
+{% block verified %}
+<h1>{{ error }}</h1>
+{% endblock %}

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+
+    <title>{% block title %}{% endblock %}</title>
+    <script>
+        addEventListener("load", function () {
+            setTimeout(hideURLbar, 0);
+        }, false);
+
+        function hideURLbar() {
+            window.scrollTo(0, 1);
+        }
+    </script>
+    <!--Loads the path to your static files-->
+    {% load staticfiles %}
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <link rel="stylesheet" href="{% static 'bootstrap-3.3.7-dist/css/bootstrap.css' %}">
+    <link rel="script" href="{% static 'bootstrap-3.3.7-dist/js/bootstrap.js' %}">
+    <link href='https://fonts.googleapis.com/css?family=Satisfy' rel='stylesheet' type='text/css'>
+    <link href="//fonts.googleapis.com/css?family=Source+Sans+Pro:200,200i,300,300i,400,400i,600,600i,700,700i,900,900i"
+          rel="stylesheet">
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script type="text/javascript"
+            src="{% static 'DataTables/DataTables-1.10.18/js/jquery.dataTables.min.js' %}"></script>
+    <script type="text/javascript"
+            src="{% static 'DataTables/DataTables-1.10.18/js/dataTables.bootstrap.min.js' %}"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <link rel="stylesheet" type="text/css"
+          href="{% static 'DataTables/DataTables-1.10.18/css/dataTables.bootstrap.min.css' %}"/>
+    <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:800" rel="stylesheet">
+</head>
+<body>
+<div id="container">
+    <div id="header">
+        <nav class="navbar navbar-inverse">
+            <div class="container-fluid">
+
+                <!--Logo-->
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#topNavBar">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="{% block link %}{% endblock %}"><img src="/static/images/new.png"></a>
+                </div>
+                {% block logout %}{% endblock %}
+                <!--Item-->
+
+            </div>
+
+            {% block tabs %}{% endblock %}
+        </nav>
+    </div>
+    <div id="body">
+        {% block content %}
+        {% endblock %}
+    </div>
+    <div id="footer">
+        <div class="copy-wthree">
+
+            <p><font color="white">© 2018 Venter . All Rights Reserved | Design by</font>
+                <a href="http://www.iitb.ac.in/" target="_blank"><font color="white">IIT Bombay, Powai</font></a>
+            </p>
+        </div>
+    </div>
+</div>
+</body>
+</html>
