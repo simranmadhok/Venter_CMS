@@ -100,7 +100,7 @@ python-mimeparse==1.6.0
 pytz==2018.4
 pywebpush==1.7.0
 PyYAML==3.13
-requests==2.5.0
+requests>=2.20.0
 requests-oauthlib==1.0.0
 requests-toolbelt==0.8.0
 rsa==3.4.2
@@ -116,7 +116,7 @@ tensorboard==1.8.0
 tensorflow==1.0.0
 termcolor==1.1.0
 uritemplate==3.0.0
-urllib3==1.22
+urllib3>=1.23
 virtualenv==16.0.0
 webencodings==0.5.1
 Werkzeug==0.14.1
