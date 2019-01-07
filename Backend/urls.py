@@ -21,5 +21,5 @@ from Login import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('',include('Login.urls')),
-    path('',include('Prediction.urls')),
+    path('',include('Venter.urls')),
 ]

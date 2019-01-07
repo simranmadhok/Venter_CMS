@@ -29,7 +29,7 @@ ALLOWED_HOSTS = ["https://venteriitb.azurewebsites.net","*"]
 # Application definition
 
 INSTALLED_APPS = [
-    'Prediction',
+    'Venter',
     'Login.apps.LoginConfig',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -100,7 +100,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Kolkata'
 
 USE_I18N = True
 
@@ -115,6 +115,8 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "./Login/static"),
 ]
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 LOGIN_REDIRECT_URL = 'home'
 
