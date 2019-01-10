@@ -16,10 +16,10 @@ Including another URLconf
 from django.conf.urls import url
 from django.contrib import admin
 from django.urls import path, include
-from django.views.generic import TemplateView
-from Login import views
+from django.views.generic import RedirectView
+
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('',include('Login.urls')),
-    path('',include('Venter.urls')),
+    path('venter/',include('Venter.urls')),
+    path('', RedirectView.as_view(url='/venter/', permanent=True)),
 ]

@@ -6,7 +6,7 @@ uploaded csv file and save it in appropriate user account.
 """
 
 from django.shortcuts import redirect
-from django.contrib.auth.models import Group
+from Venter.models import Profile
 from django.shortcuts import render
 from .forms import upload_file_form
 from django.conf import settings
@@ -14,6 +14,8 @@ from .manipulate_csv import EditCsv
 from django.http import HttpResponse
 import os
 from Venter import upload_to_google_drive
+from django.contrib.auth import logout
+from django.http import HttpResponseRedirect
 
 
 def upload_file(request):
@@ -23,7 +25,7 @@ def upload_file(request):
         return render(request, 'Venter/upload_file.html')
     else:
         # Get the group of the user
-        query_set = Group.objects.filter(user=request.user)
+        query_set = Profile.objects.filter(user=request.user)
         query_set_size = query_set.count()
         error_dict = {'error': "Please contact admin to add you in group"}
         if query_set_size == 0:
@@ -146,3 +148,44 @@ def handle_uploaded_file(f, username, filename):
     with open(path, 'wb+') as destination:
         for chunk in f.chunks():
             destination.write(chunk)
+
+def user_logout(request):
+    """
+    Author: Meet Shah
+    source implementing logout: https://www.youtube.com/watch?v=l8f-KFxw-xU source implementing file delete: https://stackoverflow.com/questions/185936/how-to-delete-the-contents-of-a-folder-in-python
+    Diff between os.unlink() and os.remove() => https://stackoverflow.com/questions/42636018/python-difference-between-os-remove-and-os-unlink-and-which-one-to-use
+    """
+    logout(request)
+    return redirect(settings.LOGIN_REDIRECT_URL)
+
+
+def edit_profile(request):
+    if not request.user.is_authenticated:
+        return redirect(settings.LOGIN_REDIRECT_URL)
+    else:
+        if request.method == 'POST':
+            first_name = request.POST['FirstName']
+            last_name = request.POST['LastName']
+            email = request.POST['Email']
+            user = request.user
+            user.first_name = first_name
+            user.last_name = last_name
+            user.email = email
+            user.save()
+            user = request.user
+            message = "Your profile has been updated successfully"
+            flag = "success"
+            company = request.user.groups.values_list('name', flat=True)
+            context = {'FirstName': user.first_name, 'LastName': user.last_name, 'UserName': request.user.username,
+                       'Group': company[0], 'Email': user.email, 'Message': message, 'Flag': flag}
+            return render(request, 'Login/edit_profile.html', context)
+
+        else:
+            user = request.user
+            company = request.user.groups.values_list('name', flat=True)
+            context = {'FirstName': user.first_name, 'LastName': user.last_name, 'UserName': request.user.username,
+                       'Group': company[0], 'Email': user.email}
+            print(company)
+            for k in context:
+                print(k, ':', context[k])
+            return render(request, 'Login/edit_profile.html', context)            

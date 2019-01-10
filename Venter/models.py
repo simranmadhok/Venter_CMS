@@ -4,21 +4,22 @@ from django.contrib.auth.models import User
 from django.db import models
 from datetime import datetime
 
-class Organisation(models.Model):
-    user = models.ForeignKey(
+class Profile(models.Model):
+    user = models.OneToOneField(
         User, 
         on_delete=models.CASCADE,
         null=True
     )
     organisation_name = models.TextField(
         primary_key=True,
-        blank=True
+        blank=True,
+        default="CIVIS"
     )
-    profile_picture = models.ImageField(
-        upload_to='User/Profile Picture/%Y/%m/%d/', 
+    organisation_logo = models.ImageField(
+        upload_to='Organisation/Organisation Logo/%Y/%m/%d/', 
         null=True, 
         blank=True,
-        verbose_name="Profile Picture"
+        verbose_name="Organisation Logo"
     )
     phone_number = models.CharField(
         blank=True, 
@@ -28,9 +29,10 @@ class Organisation(models.Model):
     def __str__(self):
         return self.organisation_name
 
+
 class Header(models.Model):
-    organisation = models.ForeignKey(
-        Organisation,
+    organisation_name = models.ForeignKey(
+        Profile,
         on_delete=models.SET_NULL, 
         null=True
     )
@@ -42,8 +44,8 @@ class Header(models.Model):
         verbose_name_plural = 'Headers'
 
 class Category(models.Model):
-    organisation = models.ForeignKey(
-        Organisation, 
+    organisation_name = models.ForeignKey(
+        Profile, 
         on_delete=models.SET_NULL, 
         null=True
     )
@@ -62,7 +64,7 @@ class File(models.Model):
         blank=True
     )
     csv_file = models.FileField(
-        upload_to='User/CSV File/%Y/%m/%d/', 
+        upload_to='Organisation/CSV File/%Y/%m/%d/', 
         null=True, 
         blank=True
     )
@@ -80,4 +82,7 @@ class File(models.Model):
     )
     class Meta:
         verbose_name_plural = 'CSV File Meta Information'
+
+    def __str__(self):
+        return self.file_name
     
