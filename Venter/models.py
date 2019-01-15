@@ -10,9 +10,10 @@ class Profile(models.Model):
         on_delete=models.CASCADE,
         null=True
     )
-    organisation_name = models.TextField(
+    organisation_name = models.CharField(
         primary_key=True,
         blank=True,
+        max_length = 200,
         default="CIVIS"
     )
     organisation_logo = models.ImageField(
@@ -25,6 +26,10 @@ class Profile(models.Model):
         blank=True, 
         max_length=10
     )
+    additional_details = models.TextField(
+        blank=True
+    )
+
 
     def __str__(self):
         return self.organisation_name
@@ -49,7 +54,7 @@ class Category(models.Model):
         on_delete=models.SET_NULL, 
         null=True
     )
-    category = models.TextField(
+    category = models.CharField(
        blank=True,
        max_length=200
     )
@@ -77,8 +82,9 @@ class File(models.Model):
         null=True,
         blank=True
     )
-    file_name = models.TextField(
-        blank = True
+    file_name = models.CharField(
+        blank = True,
+        max_length = 200
     )
     class Meta:
         verbose_name_plural = 'CSV File Meta Information'

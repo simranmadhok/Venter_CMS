@@ -1,5 +1,5 @@
 from django.urls import path, include
-from . import views
+from . import views # pylint: disable = E0611
 from django.views.generic import TemplateView
 from django.conf import settings
 from django.conf.urls.static import static
@@ -16,6 +16,7 @@ urlpatterns = [
     path('McgmCategory/', TemplateView.as_view(template_name='Venter/mcgm_categories.html'), name='McgmCategory'),
     path('SpeakupCategory/', TemplateView.as_view(template_name='Venter/speakup_categories.html'),
          name='SpeakupCategory'),
+    path('categoryList/<organisation_name>', views.CategoryListView.as_view(), name='category_list'),
     path('predict/checkOutput/', views.handle_user_selected_data, name='checkOutput'),
 ]
 

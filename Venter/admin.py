@@ -16,21 +16,19 @@ class FileAdmin(admin.ModelAdmin):
     list_display=('file_name', 'uploaded_by', 'uploaded_date') 
     list_filter = ['uploaded_date']   
 
-class ProfileInline(admin.StackedInline):
-    model = Profile
-    can_delete = False
+class ProfileAdmin(admin.ModelAdmin):
     verbose_name_plural = 'Organisation Details'
     fk_name = 'user'
-    readonly_fields=['phone_number', 'organisation_name']
-
-class UserAdmin(BaseUserAdmin):
-    inlines = (ProfileInline,)
+    #readonly_fields=['organisation_name']
+    list_display=('organisation_name', 'phone_number')
 
 
 admin.site.register(Header, HeaderAdmin)
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(File, FileAdmin)
-admin.site.unregister(User)
-admin.site.register(User, UserAdmin)
+admin.site.register(Profile, ProfileAdmin)
+# admin.site.unregister(User)
+# admin.site.register(User, UserAdmin)
+
 
 
