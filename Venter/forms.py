@@ -2,6 +2,7 @@ from django import forms
 from django.template.defaultfilters import filesizeformat
 from django.utils.translation import ugettext_lazy as f
 from django.conf import settings
+from Venter.models import Profile
 
 
 class upload_file_form(forms.Form):
@@ -30,3 +31,12 @@ class upload_file_form(forms.Form):
         else:
             raise forms.ValidationError(f('Please Upload Csv File Only !!!'))
         return content
+
+class registration_form(forms.ModelForm):
+    additional_details = forms.CharField(widget = forms.TextInput)
+    phone_number = forms.CharField(widget=forms.TextInput(attrs={'type':'number', 'max_length': 10}),error_messages={"max_length":"Please enter a phone number of 10 digits only"})  
+    class Meta:
+        model = Profile
+        exclude = ['user', 'organisation_logo']
+
+# class edit_profile_form(forms)

@@ -149,7 +149,7 @@ button:hover, input[type="submit"]:hover {
 /* Add a background color and some padding around the form */
 
 body {
-    background: #000000 url("images/wallpaper.jpg");
+    /* background: #000000 url("images/wallpaper.jpg"); */
     background-repeat:no-repeat;
     background-size:cover;
 }

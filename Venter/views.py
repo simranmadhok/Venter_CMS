@@ -5,17 +5,21 @@ This view will render a simple html form if the request is GET. If request is PO
 uploaded csv file and save it in appropriate user account.
 """
 
-from django.shortcuts import redirect
-from Venter.models import Profile
-from django.shortcuts import render
-from .forms import upload_file_form
-from django.conf import settings
-from .manipulate_csv import EditCsv
-from django.http import HttpResponse
 import os
-from Venter import upload_to_google_drive
+
+from django.conf import settings
 from django.contrib.auth import logout
-from django.http import HttpResponseRedirect
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse, HttpResponseRedirect
+from django.shortcuts import redirect, render
+from django.utils.decorators import method_decorator
+from django.views import generic
+
+from Venter import upload_to_google_drive
+from Venter.models import Category, Profile
+from django.shortcuts import get_object_or_404
+from .forms import registration_form, upload_file_form
+from .manipulate_csv import EditCsv
 
 
 def upload_file(request):
@@ -25,7 +29,7 @@ def upload_file(request):
         return render(request, 'Venter/upload_file.html')
     else:
         # Get the group of the user
-        query_set = Profile.objects.filter(user=request.user)
+        query_set = Profile.objects.filter(user=request.user)  #pylint: disable=E1101
         query_set_size = query_set.count()
         error_dict = {'error': "Please contact admin to add you in group"}
         if query_set_size == 0:
@@ -67,7 +71,7 @@ def upload_file(request):
         else:
             # If the request is not POST, display the form to submit
             form = upload_file_form()
-        return render(request, 'Venter/upload_file.html', {'form': form})
+        return render(request, 'Venter/upload_file.html', {'form': registration_form()})
 
 
 def handle_user_selected_data(request):
@@ -189,3 +193,11 @@ def edit_profile(request):
             for k in context:
                 print(k, ':', context[k])
             return render(request, 'Login/edit_profile.html', context)            
+
+
+@method_decorator(login_required, 'dispatch')
+class CategoryListView(generic.ListView):
+    model = Category
+    
+    def get_queryset(self):
+        return Category.objects.filter(organisation_name=self.request.user.profile.organisation_name)
