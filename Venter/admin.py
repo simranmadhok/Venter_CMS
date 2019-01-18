@@ -1,8 +1,6 @@
 # Register your models here.
 from django.contrib import admin
-from Venter.models import Header, Category, File, Profile
-from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from django.contrib.auth.models import User
+from Venter.models import Header, Category, File, Organisation, Profile
  
 class HeaderAdmin(admin.ModelAdmin):
     list_display = ('organisation_name', 'header')
@@ -17,18 +15,25 @@ class FileAdmin(admin.ModelAdmin):
     list_filter = ['uploaded_date']   
 
 class ProfileAdmin(admin.ModelAdmin):
+    verbose_name_plural = 'Employee Details'
+    list_display=('organisation_name', 'phone_number', 'user')
+
+# class CustomUserAdmin(UserAdmin):
+#     add_form = CustomUserCreationForm
+#     form = CustomUserChangeForm
+#     model = CustomUser
+#     list_display = ['username', 'first_name','last_name'] 
+#     search_fields = ('username',)   
+
+class OrganisationAdmin(admin.ModelAdmin):
     verbose_name_plural = 'Organisation Details'
-    fk_name = 'user'
-    #readonly_fields=['organisation_name']
-    list_display=('organisation_name', 'phone_number')
 
 
 admin.site.register(Header, HeaderAdmin)
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(File, FileAdmin)
 admin.site.register(Profile, ProfileAdmin)
-# admin.site.unregister(User)
-# admin.site.register(User, UserAdmin)
+admin.site.register(Organisation, OrganisationAdmin)
 
 
 
