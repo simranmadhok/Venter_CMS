@@ -18,13 +18,6 @@ class ProfileAdmin(admin.ModelAdmin):
     verbose_name_plural = 'Employee Details'
     list_display=('organisation_name', 'phone_number', 'user')
 
-# class CustomUserAdmin(UserAdmin):
-#     add_form = CustomUserCreationForm
-#     form = CustomUserChangeForm
-#     model = CustomUser
-#     list_display = ['username', 'first_name','last_name'] 
-#     search_fields = ('username',)   
-
 class OrganisationAdmin(admin.ModelAdmin):
     verbose_name_plural = 'Organisation Details'
 
