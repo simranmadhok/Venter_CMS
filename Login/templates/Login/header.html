@@ -4,31 +4,16 @@
         <div class="collapse navbar-collapse" id="topNavBar">
             <ul class="nav navbar-nav navbar-right">
                 <li class="">
-                    <a href="{% url 'edit_profile' %}">
+                    <a href="{% url 'update_profile' request.user.pk %}">
                         <span class="glyphicon glyphicon-user" aria-hidden="true"></span>&nbsp; {{ user.username }}
                     </a>
                 </li>
                 <li class="">
-                    <a>
-                        <span class="glyphicon glyphicon-briefcase"
-                              aria-hidden="true"></span>&nbsp; {{ user.groups.all.0 }}
+                    <a href="{% url 'category_list' request.user %}">
+                        <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>&nbsp;Category List
                     </a>
                 </li>
-                {% if user.groups.all.0.name == "ICMC" %}
-                    <li class="">
-                        <a href="{% url 'McgmCategory' %}">
-                        <span class="glyphicon glyphicon-list-alt"
-                              aria-hidden="true"></span>&nbsp; MGCM Category List
-                        </a>
-                    </li>
-                {% elif user.groups.all.0.name == "SpeakUP" %}
-                    <li class="">
-                        <a href="{% url 'SpeakupCategory' %}">
-                        <span class="glyphicon glyphicon-list-alt"
-                              aria-hidden="true"></span>&nbsp; SpeakUp Category List
-                        </a>
-                    </li>
-                {% endif %}
+
                 <li class="">
                     <a href="{% url 'logout' %}">
                         <span class="glyphicon glyphicon-off" aria-hidden="true"></span>&nbsp; Logout
@@ -36,12 +21,21 @@
                 </li>
             </ul>
         </div>
+    {% else %}
+        <div class="collapse navbar-collapse" id="topNavBar">
+            <ul class="nav navbar-nav navbar-right">
+                <li class="">
+                    <a href="{% url 'create_profile' %}">Register</a>
+                </li>
+            </ul>
+        </div>
     {% endif %}
+
 {% endblock %}
 {% block tabs %}
     {% if user.is_authenticated %}
         <br><font color="white">
-        <a class="btn btn-info" type="button" href="{% url 'predict' %}" style="float: right;" > Category Prediction Model </a>
+        <a class="btn btn-info" type="button" href="{% url 'upload_csv' request.user.pk  %}" style="float: right;" > Upload CSV File </a>
         </font>
     {% endif %}
 {% endblock %}

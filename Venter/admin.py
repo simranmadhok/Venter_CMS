@@ -1,8 +1,6 @@
 # Register your models here.
 from django.contrib import admin
-from Venter.models import Header, Category, File, Profile
-from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from django.contrib.auth.models import User
+from Venter.models import Header, Category, File, Organisation, Profile
  
 class HeaderAdmin(admin.ModelAdmin):
     list_display = ('organisation_name', 'header')
@@ -16,21 +14,19 @@ class FileAdmin(admin.ModelAdmin):
     list_display=('file_name', 'uploaded_by', 'uploaded_date') 
     list_filter = ['uploaded_date']   
 
-class ProfileInline(admin.StackedInline):
-    model = Profile
-    can_delete = False
-    verbose_name_plural = 'Organisation Details'
-    fk_name = 'user'
-    readonly_fields=['phone_number', 'organisation_name']
+class ProfileAdmin(admin.ModelAdmin):
+    verbose_name_plural = 'Employee Details'
+    list_display=('organisation_name', 'phone_number', 'user')
 
-class UserAdmin(BaseUserAdmin):
-    inlines = (ProfileInline,)
+class OrganisationAdmin(admin.ModelAdmin):
+    verbose_name_plural = 'Organisation Details'
 
 
 admin.site.register(Header, HeaderAdmin)
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(File, FileAdmin)
-admin.site.unregister(User)
-admin.site.register(User, UserAdmin)
+admin.site.register(Profile, ProfileAdmin)
+admin.site.register(Organisation, OrganisationAdmin)
+
 
 

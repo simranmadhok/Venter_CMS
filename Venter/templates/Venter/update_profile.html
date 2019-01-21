@@ -1,0 +1,14 @@
+{% extends 'Login/header.html' %}
+{% block title %}Update Profile{% endblock %}
+{% block link %}{% url 'home' %} {% endblock %}
+{% block verified %}
+
+    <form method="post" name="form" enctype="multipart/form-data">
+        {% csrf_token %}
+        <!-- <label>Organization: </label>&nbsp;&nbsp;{{ request.user.profile.organisation_name }}<br> -->
+        {{ user_form.as_p }}
+        {{ profile_form.as_p }}
+        <input type="submit" value="Update">
+    </form>
+
+{% endblock %}

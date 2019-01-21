@@ -1,0 +1,16 @@
+{% extends 'Login/header.html' %}
+{% block title %}Category List{% endblock %}
+{% block link %}{% url 'home' %} {% endblock %}
+{% block verified %}
+
+<h1>Category List</h1>
+  {% if category_list %}
+    <ul>
+        {% for c in category_list %}
+        <li>
+              <span style="color:black;">{{c.category}}</span>
+        </li>
+        {% endfor %}
+    </ul>
+  {% endif %} 
+{% endblock %}

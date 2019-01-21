@@ -5,8 +5,20 @@ Learn Jinja Templating in Django before going to this code
 
 {% extends 'Login/header.html' %}
 {% block title %}Upload CSV file{% endblock %}
-{% block link %}{% url 'home' %} {% endblock %}
-{% block verified %}
+{% block content %}
+
+<form method="post"  action="{% url 'upload_csv' request.user.pk %}"enctype="multipart/form-data">
+    {% csrf_token %}
+    <label>Organisation: </label>&nbsp;&nbsp;{{ request.user.profile.organisation_name }}<br>
+    {{ csv_form.as_p }}
+    <input type="submit" value="Upload CSV File">
+</form>
+
+{% endblock %}
+
+
+
+<!-- {% block verified %}
     <script>
         function showLoading() {
             if ($("#filename").val() != "") {
@@ -27,7 +39,7 @@ Learn Jinja Templating in Django before going to this code
                 {{ Error }}
             </div>
         {% endif %}
-        <h3><div class="font"><font color="#78A05A"> Upload CSV file here</font></div></h3>
+        <h3><div class="font"><font color="#78A05A"> Inquiry Form</font></div></h3>
         <form action="" method="post" enctype="multipart/form-data">
             <div class="landingtext">
                 {% csrf_token %}
@@ -42,7 +54,7 @@ Learn Jinja Templating in Django before going to this code
             background: rgba(143, 143, 143, 0.80);
             padding: 15px;
             width: 65%;
-            text-align: left;
+            text-align: start;
             border-radius: 25px;
             font-size: 20px;
         }
@@ -55,4 +67,4 @@ Learn Jinja Templating in Django before going to this code
         1px 1px 0 #000;
         }
     </style>
-{% endblock %}
+{% endblock %} -->
