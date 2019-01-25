@@ -1,10 +1,6 @@
-from django import forms
-from django.template.defaultfilters import filesizeformat
-from django.utils.translation import ugettext_lazy as f
-from django.conf import settings
 from django.contrib.auth.models import User
-from Venter . models import Profile, File
-
+from django import forms
+from Venter.models import File, Profile
 
 # class upload_file_form(forms.Form):
 #     """
@@ -33,7 +29,16 @@ from Venter . models import Profile, File
 #             raise forms.ValidationError(f('Please Upload Csv File Only !!!'))
 #         return content
 
+
 class CSVForm(forms.ModelForm):
+    """
+    ModelForm, used to facilitate CSV file upload.
+
+    Validation checks made for each csv file: type, size, row count, headers.
+
+    Usage:
+        1) upload_file.html template: Generates the file form fields in the csv file upload page for logged in users.
+    """
     class Meta:
         model = File
         fields = ('csv_file', 'file_name')
@@ -44,21 +49,35 @@ class CSVForm(forms.ModelForm):
         # header validation --> code written in script.py for reference
         # then upload the csv file
 
+
 class UserForm(forms.ModelForm):
+    """
+    Modelform, generated from Django's user model.
+
+    Usage------
+        1) 'registration.html' template: Generates the user form fields in the signup page for new users.
+        2) 'update_profile.html' template: Generates the user form fields in the update profile page for existing users.
+    """
     class Meta:
         model = User
         fields = ('username', 'password', 'email', 'first_name', 'last_name')
 
-    def save(self, **kwargs):
+    def save(self): # pylint: disable = W0221
         user = super(UserForm, self).save(commit=False)
         password = self.cleaned_data.get('password')
         user.set_password(password)
         user.save()
         return user
 
+
 class ProfileForm(forms.ModelForm):
+    """
+    Modelform, generated from Django's Profile model.
+
+    Usage------
+        1) 'registration.html' template: Generates the profile form fields in the signup page for new users.
+        2) 'update_profile.html' template: Generates the profile form fields in the update profile page for existing users.
+    """
     class Meta:
         model = Profile
         fields = ('organisation_name', 'phone_number', 'profile_picture')
-
-               
