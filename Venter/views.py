@@ -1,5 +1,4 @@
 import os
-
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import logout
@@ -7,17 +6,17 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect, render
 from django.urls import reverse, reverse_lazy
-from django.views.generic.list import ListView
 from django.views.generic.edit import CreateView, UpdateView
+from django.views.generic.list import ListView
 
 from Venter import upload_to_google_drive
 from Venter.models import Category, Profile
 
-from .forms import CSVForm, ProfileForm, UserForm
+from Venter.forms import CSVForm, ProfileForm, UserForm
 from .manipulate_csv import EditCsv
 
 
-def upload_csv_file(request, pk):
+def upload_csv_file(request):
     """
     View logic for uploading CSV file by a logged in user.
 
@@ -25,72 +24,17 @@ def upload_csv_file(request, pk):
     <Describe csv file upload logic>
     """
     if request.method == 'POST':
-        csv_form = CSVForm(request.POST, request.FILES, instance=request.user)
+        csv_form = CSVForm(request.POST, request.FILES, request=request)
         if csv_form.is_valid():
-            # perform header validation --> refer to script.py
-            # extract file size from csv file uploaded, and add it to the 'file_size' field of File model
-            # then save the csv file instance
+            file_uploaded = csv_form.save(commit=False)
+            file_uploaded.uploaded_by = request.user
             csv_form.save()
-            return HttpResponse("<h1>Your csv file was uploaded</h1>")
+            return HttpResponse("<h1>Your csv file was uploaded, redirect user to prediction page (pie charts, tables..)</h1>")
         else:
-            return HttpResponse("<h1>Error uploading file</h1>")
-
+            return render(request, './Venter/upload_file.html', {'csv_form': csv_form})
     elif request.method == 'GET':
-        csv_form = CSVForm()
+        csv_form = CSVForm(request=request)
         return render(request, './Venter/upload_file.html', {'csv_form': csv_form})
-
-
-# def upload_file(request):
-#     """This method handles the file uploaded and send the content to the frontend"""
-#     if not request.user.is_authenticated:
-#         # If not authenticated, redirect to upload_file.html
-#         return render(request, 'Venter/upload_file.html')
-#     else:
-#         # Get the group of the user
-#         query_set = Profile.objects.filter(user=request.user)  #pylint: disable=E1101
-#         query_set_size = query_set.count()
-#         error_dict = {'error': "Please contact admin to add you in group"}
-#         if query_set_size == 0:
-#             # If the group is not assigned, display error message
-#             return render(request, 'Venter/error_message.html', error_dict)
-#         else:
-#             # Saving the group as company. This will be used for getting different prediction lists and category lists for different companies
-#             company = str(query_set.all()[0])
-#             request.session['company'] = company
-
-#         # This post method is from clicking on 'Submit' button while uploading the csv file
-#         if request.method == 'POST':
-#             # Getting the data after all the validations
-#             form = upload_file_form(request.POST, request.FILES)
-#             user_name = request.user.username
-#             file_name = str(request.FILES['file'].name)
-#             if form.is_valid():
-#                 # Execute the prediction of data only if the form is valid
-#                 handle_uploaded_file(request.FILES['file'], user_name,
-#                                      file_name)  # This is a precautionary step to see whether the folders for each user has been made or not
-#                 # Creating an object of the class which will be used to manipulate all the csv data
-#                 csv = EditCsv(file_name, user_name, company)
-#                 # Checking whether the headers of the file are in the same format as given in settings.ICMC_HEADERS or settings.SPEAKUP_HEADERS based on their groups
-#                 header_flag, category_list = csv.check_csvfile_header()
-#                 if header_flag:
-#                     # If all the headers are matching in the csv file
-#                     dict_list, rows = csv.read_file()  # Here we are getting a list of dictionary (structure is in EditCsv.py) in dict_list and the rows which is the rest of the material in the csv file
-#                     context = {'dict_list': dict_list, 'category_list': category_list, 'rows': rows}
-#                     request.session['Rows'] = rows
-#                     request.session['filename'] = file_name
-#                     return render(request, 'Venter/predict_categories.html',
-#                                   context)  # Sending the data in the Frontend to display
-#                 else:
-#                     # If the header_flag is false, delete the Input file
-#                     csv.delete()
-#                     form = upload_file_form()  # Reinitialize the upload_file_form
-#                     return render(request, 'Venter/upload_file.html',
-#                                   {'form': form, 'Error': "Please submit CSV file with valid headers !!!"})
-#         else:
-#             # If the request is not POST, display the form to submit
-#             form = upload_file_form()
-#         return render(request, 'Venter/upload_file.html', {'form': upload_file_form()})
-
 
 def handle_user_selected_data(request):
     """This function is used to handle the selected categories by the user"""

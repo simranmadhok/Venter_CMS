@@ -1,53 +1,59 @@
-from django.contrib.auth.models import User
 from django import forms
-from Venter.models import File, Profile
+from django.contrib.auth.models import User
 
-# class upload_file_form(forms.Form):
-#     """
-#     Author: Meet Shah, Shivam Sharma
-#     Source:  This link helped me to write validation code
-#              https://stackoverflow.com/questions/2472422/django-file-upload-size-limit
-#     """
-#     # The attrs is an in built parameter for the FileInput in the form.
-#     file = forms.FileField(label='Choose CSV File', widget=forms.FileInput(attrs={'accept': ".csv", "id": "filename"}))
-
-#     def clean_file(self):
-#         content = self.cleaned_data['file']
-#         filename = str(content)
-#         max_size = int(settings.MAX_UPLOAD_SIZE)
-#         upload_file_size = int(
-#             content.size)  # This code might give a buffer error so find a good solution for this. Look at the source link for reference
-
-#         # Validating the format of the file
-#         if filename.endswith('.csv'):
-#             # Check for the file size of the uploaded file with the max size (12 MB)
-#             if upload_file_size > max_size:
-#                 # Beware, the ugettext_lazy might not work for python 3.5 and below. It's better to use f strings with Python 3.6 and above. The latest version, the better.
-#                 raise forms.ValidationError(f('Please keep file size under %s. Current file size is %s') % (
-#                     filesizeformat(settings.MAX_UPLOAD_SIZE), filesizeformat(content.size))) # filesizeformat is an in built function. Check it's documentation
-#         else:
-#             raise forms.ValidationError(f('Please Upload Csv File Only !!!'))
-#         return content
+from Backend import settings
+from Venter.models import File, Header, Profile
 
 
 class CSVForm(forms.ModelForm):
     """
     ModelForm, used to facilitate CSV file upload.
 
-    Validation checks made for each csv file: type, size, row count, headers.
-
     Usage:
         1) upload_file.html template: Generates the file form fields in the csv file upload page for logged in users.
     """
     class Meta:
         model = File
-        fields = ('csv_file', 'file_name')
+        fields = ('csv_file',)
 
-        # check file extension .csv
-        # check file size 5MB or less
-        # check file row count (1000 rows or whatever required)
-        # header validation --> code written in script.py for reference
-        # then upload the csv file
+    def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop("request")
+        super(CSVForm, self).__init__(*args, **kwargs)
+
+    def clean_csv_file(self):
+        uploaded_csv_file = self.cleaned_data['csv_file']
+        if uploaded_csv_file:
+            filename = uploaded_csv_file.name
+
+            # preparing the csv row list by converting bytes class '' to string
+            csv_str = uploaded_csv_file.readline().decode('utf-8')
+            csv_list = csv_str.split(',')
+            # strip() function executes over each item of csv_list(a list) to remove all the leading and trailing whitespaces
+            csv_striped_list = [item.strip() for item in csv_list]
+            csv_set = set(csv_striped_list)
+
+            # retrieving the organisation name of the logged in user
+            org_name = self.request.user.profile.organisation_name
+            # retrieving the headers list for particular organisation
+            model_header_list = Header.objects.filter(
+                organisation_name=org_name).values_list('header', flat=True)
+            header_set = set(model_header_list)
+
+            if filename.endswith(settings.FILE_UPLOAD_TYPE):
+                if uploaded_csv_file.size < int(settings.MAX_UPLOAD_SIZE):
+                    if csv_set == header_set:
+                        return uploaded_csv_file
+                    else:
+                        raise forms.ValidationError(
+                            "Incorrect headers, please contact your administrator")
+                else:
+                    raise forms.ValidationError(
+                        "File size must not exceed 5 MB")
+            else:
+                raise forms.ValidationError(
+                    "Please upload .csv extension files only")
+
+        return uploaded_csv_file
 
 
 class UserForm(forms.ModelForm):
@@ -62,7 +68,7 @@ class UserForm(forms.ModelForm):
         model = User
         fields = ('username', 'password', 'email', 'first_name', 'last_name')
 
-    def save(self): # pylint: disable = W0221
+    def save(self):  # pylint: disable = W0221
         user = super(UserForm, self).save(commit=False)
         password = self.cleaned_data.get('password')
         user.set_password(password)

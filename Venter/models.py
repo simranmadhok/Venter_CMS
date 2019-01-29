@@ -86,13 +86,6 @@ class File(models.Model):
     uploaded_date = models.DateTimeField(
         default=datetime.now,
     )
-    file_size = models.IntegerField()
-    file_name = models.CharField(
-        max_length=200
-    )
 
     class Meta:
-        verbose_name_plural = 'CSV File Meta Information'
-
-    def __str__(self):
-        return self.file_name
+        verbose_name_plural = 'CSV File Meta'
