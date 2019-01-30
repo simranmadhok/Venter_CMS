@@ -25,8 +25,4 @@ urlpatterns = [
     # ex: /venter/category_list/civis/
     path('category_list/<organisation_name>', views.CategoryListView.as_view(), name='category_list'),
     path('predict/checkOutput/', views.handle_user_selected_data, name='checkOutput'),
-]
-
-if settings.DEBUG:
-    # ex: /media/Organisation/Organisation%20Logo/2018/12/08/logo1.png
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

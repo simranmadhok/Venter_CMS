@@ -20,8 +20,12 @@ def upload_csv_file(request):
     """
     View logic for uploading CSV file by a logged in user.
 
-    Note-------
-    <Describe csv file upload logic>
+    For POST request-------
+        1) The POST data, uploaded csv file and a request parameter are being sent to CSVForm as arguments
+        2) If form.is_valid() returns true, the user is assigned to the uploaded_by field
+        3) csv_form is saved and currently returns a simple httpresponse inplace of prediction results
+    For GET request-------
+        The csv_form is rendered in the template 
     """
     if request.method == 'POST':
         csv_form = CSVForm(request.POST, request.FILES, request=request)
