@@ -7,12 +7,22 @@ Learn Jinja Templating in Django before going to this code
 {% block title %}Upload CSV file{% endblock %}
 {% block content %}
 
-<form method="post"  action="{% url 'upload_csv' request.user.pk %}"enctype="multipart/form-data">
+<form method="post"  action="{% url 'upload_csv' %}" enctype="multipart/form-data">
     {% csrf_token %}
     <label>Organisation: </label>&nbsp;&nbsp;{{ request.user.profile.organisation_name }}<br>
     {{ csv_form.as_p }}
     <input type="submit" value="Upload CSV File">
 </form>
+
+{% if csv_form.errors %}
+    {% for field in csv_form %}
+        {% for error in field.errors %}
+            <div class="alert alert-danger">
+                <strong>{{ error|escape }}</strong>
+            </div>
+        {% endfor %}
+    {% endfor %}
+{% endif %}
 
 {% endblock %}
 

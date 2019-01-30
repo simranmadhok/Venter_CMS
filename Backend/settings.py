@@ -24,7 +24,7 @@ SECRET_KEY = 'p!63vi=_4)o5h8k0ep4uy2e6ou^k$9wels#e&&x=^^!=$xa21o'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["https://venteriitb.azurewebsites.net","*"]
+ALLOWED_HOSTS = ["https://venteriitb.azurewebsites.net", "*"]
 
 # Application definition
 
@@ -54,8 +54,7 @@ ROOT_URLCONF = 'Backend.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': []
-        ,
+        'DIRS': [],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -110,7 +109,7 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
-STATIC_ROOT = os.path.join(BASE_DIR,'static')
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "./Login/static"),
@@ -127,7 +126,7 @@ EMAIL_FILE_PATH = os.path.join(BASE_DIR, "sent_emails")
 MEDIA_ROOT = os.path.join(BASE_DIR, "MEDIA/")
 
 # Maximum size of file uploaded by user
-# 12534336 B = 12 MB
-MAX_UPLOAD_SIZE = "12534336"
+# 5242880 = 5 MB
+MAX_UPLOAD_SIZE = "5242880"
 
-DATA_UPLOAD_MAX_NUMBER_FIELDS = 1000000
+FILE_UPLOAD_TYPE = 'csv'

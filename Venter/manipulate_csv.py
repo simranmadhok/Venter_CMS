@@ -33,13 +33,15 @@ Structure of Dict_List which will be sent to the frontend:
             ]
 """
 
+import operator
+import os
+
 import pandas as pd
 from django.conf import settings
-import os
-import operator
 
 from Venter.ML_model.model.ClassificationService import ClassificationService
-from Venter.ML_model.SpeakUp.Model.SpeakupClassificationService import ClassificationService_speakup
+from Venter.ML_model.SpeakUp.Model.SpeakupClassificationService import \
+    ClassificationService_speakup
 
 
 class EditCsv:

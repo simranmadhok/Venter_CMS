@@ -35,7 +35,7 @@
 {% block tabs %}
     {% if user.is_authenticated %}
         <br><font color="white">
-        <a class="btn btn-info" type="button" href="{% url 'upload_csv' request.user.pk  %}" style="float: right;" > Upload CSV File </a>
+        <a class="btn btn-info" type="button" href="{% url 'upload_csv' %}" style="float: right;" > Upload CSV File </a>
         </font>
     {% endif %}
 {% endblock %}
