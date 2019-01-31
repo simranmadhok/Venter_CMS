@@ -2,8 +2,8 @@ from django import forms
 from django.contrib.auth.models import User
 
 from Backend import settings
-from Venter.models import File, Header, Profile
-
+from Venter.models import File, Profile
+from .validate import csv_file_header_validation
 
 class CSVForm(forms.ModelForm):
     """
@@ -37,32 +37,12 @@ class CSVForm(forms.ModelForm):
 
         # checks for non-null file upload
         if uploaded_csv_file:
-            # extracting and converting the header from bytes to string format
-            csv_str = uploaded_csv_file.readline().decode('utf-8')
-
-            # converting the headers from string to list using comma separated delimiters
-            csv_list = csv_str.split(',')
-
-            # strip() function executes over each item of csv_list to remove all the leading and trailing whitespaces
-            # this should normalise all the header categories with whitespaces in them
-            # then we cast the list to a set to allow us to validate it with the organisation's header list
-            csv_striped_list = [item.strip() for item in csv_list]
-            csv_set = set(csv_striped_list)
-
-            # obtaining the organisation name of the logged in user
-            # this retrieves the header list for a particular organisation and casts it to a set
-            org_name = self.request.user.profile.organisation_name
-            model_header_list = Header.objects.filter(
-                organisation_name=org_name).values_list('header', flat=True)
-            header_set = set(model_header_list)
-
             # validation of the filetype based on the extension type .csv
             # validation of the filesize based on the size limit 5MB
-            # validation of the header list extracted from the csv file and the logged-in user's organisation
             filename = uploaded_csv_file.name
             if filename.endswith(settings.FILE_UPLOAD_TYPE):
                 if uploaded_csv_file.size < int(settings.MAX_UPLOAD_SIZE):
-                    if csv_set == header_set:
+                    if csv_file_header_validation(uploaded_csv_file, self.request):
                         return uploaded_csv_file
                     else:
                         raise forms.ValidationError(

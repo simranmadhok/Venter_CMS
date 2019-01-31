@@ -5,7 +5,10 @@
 <form method="post"  action="{% url 'upload_csv' %}" enctype="multipart/form-data">
     {% csrf_token %}
     <label>Organisation: </label>&nbsp;&nbsp;{{ request.user.profile.organisation_name }}<br>
-    {{ csv_form.as_p }}
+
+    <label for="{{ form.csv_file.id_for_label }}">CSV File:</label>
+    {{ csv_form.csv_file }}
+    
     <input type="submit" value="Upload CSV File">
 </form>
 
