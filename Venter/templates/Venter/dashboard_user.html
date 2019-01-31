@@ -1,0 +1,10 @@
+{% extends 'Login/header.html' %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+
+<table style='table-layout: auto'>
+    {% for file in file_list %}
+        <li>{{ file.filename}}</li>
+    {% endfor %}
+</table>
+{% endblock %}

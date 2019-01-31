@@ -1,4 +1,5 @@
 import os
+
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import logout
@@ -6,13 +7,14 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect, render
 from django.urls import reverse, reverse_lazy
+from django.views import generic
 from django.views.generic.edit import CreateView, UpdateView
 from django.views.generic.list import ListView
 
 from Venter import upload_to_google_drive
-from Venter.models import Category, Profile
-
 from Venter.forms import CSVForm, ProfileForm, UserForm
+from Venter.models import Category, File, Profile
+
 from .manipulate_csv import EditCsv
 
 
@@ -25,7 +27,7 @@ def upload_csv_file(request):
         2) If form.is_valid() returns true, the user is assigned to the uploaded_by field
         3) csv_form is saved and currently returns a simple httpresponse inplace of prediction results
     For GET request-------
-        The csv_form is rendered in the template 
+        The csv_form is rendered in the template
     """
     if request.method == 'POST':
         csv_form = CSVForm(request.POST, request.FILES, request=request)
@@ -203,3 +205,11 @@ class CreateProfileView(CreateView):
         user_form = UserForm()
         profile_form = ProfileForm()
         return render(request, './Venter/registration.html', {'user_form': user_form, 'profile_form': profile_form})
+
+class FilesByUserListView(generic.ListView):
+    model = File
+    template_name = './Venter/dashboard_user.html'
+    context_object_name = 'file_list'
+
+    def get_queryset(self):
+        return File.objects.filter(uploaded_by=self.request.user)

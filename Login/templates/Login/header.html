@@ -34,9 +34,12 @@
 {% endblock %}
 {% block tabs %}
     {% if user.is_authenticated %}
-        <br><font color="white">
+        <br><span color="white">
         <a class="btn btn-info" type="button" href="{% url 'upload_csv' %}" style="float: right;" > Upload CSV File </a>
-        </font>
+        </span>
+        <br><span color="white">
+        <a class="btn btn-warning" type="button" href="{% url 'dashboard_user' request.user.pk %}" style="float: right;" > Dashboard </a>
+        </span>
     {% endif %}
 {% endblock %}
 {% block content %}

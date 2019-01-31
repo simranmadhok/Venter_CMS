@@ -24,5 +24,6 @@ urlpatterns = [
     path('download/', views.file_download, name='download_file'),
     # ex: /venter/category_list/civis/
     path('category_list/<organisation_name>', views.CategoryListView.as_view(), name='category_list'),
+    path('dashboard_user/<int:pk>', views.FilesByUserListView.as_view(), name='dashboard_user'),
     path('predict/checkOutput/', views.handle_user_selected_data, name='checkOutput'),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

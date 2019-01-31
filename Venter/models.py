@@ -1,3 +1,4 @@
+import os
 from datetime import datetime
 
 from django.contrib.auth.models import User
@@ -123,6 +124,9 @@ class File(models.Model):
     uploaded_date = models.DateTimeField(
         default=datetime.now,
     )
+
+    def filename(self):
+        return os.path.basename(self.csv_file.name) # pylint: disable = E1101
 
     class Meta:
         verbose_name_plural = 'CSV File Meta'
