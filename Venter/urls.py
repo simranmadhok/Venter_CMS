@@ -1,5 +1,3 @@
-from django.conf import settings
-from django.conf.urls.static import static
 from django.urls import include, path
 from django.views.generic import TemplateView
 
@@ -24,6 +22,9 @@ urlpatterns = [
     path('download/', views.file_download, name='download_file'),
     # ex: /venter/category_list/civis/
     path('category_list/<organisation_name>', views.CategoryListView.as_view(), name='category_list'),
+    # ex: /venter/dashboard_user/5/
     path('dashboard_user/<int:pk>', views.FilesByUserListView.as_view(), name='dashboard_user'),
+    # ex: /venter/dashboard_staff/
+    path('dashboard_staff/', views.FilesByOrganisationListView.as_view(), name='dashboard_staff'),
     path('predict/checkOutput/', views.handle_user_selected_data, name='checkOutput'),
-]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+]
