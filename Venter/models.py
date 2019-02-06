@@ -1,9 +1,34 @@
 import os
-from datetime import datetime
+from datetime import datetime, date
 
 from django.contrib.auth.models import User
 from django.db import models
 
+
+def get_file_upload_path(instance, filename):
+    """
+    Returns a custom MEDIA path for files uploaded by a user
+    Eg: /MEDIA/CSV Files/xyz/user1/2019-02-06/file1.csv
+    """
+    return os.path.join(
+        f'CSV Files/{instance.uploaded_by.profile.organisation_name}/{instance.uploaded_by.profile.user.username}/{instance.uploaded_date.date()}/{filename}')
+
+def get_organisation_logo_path(instance, filename):
+    """
+    Returns a custom MEDIA path for organisation logo uploaded by staff member
+    Eg: /MEDIA/Organisation Logo/xyz/2019-02-06/image1.png
+    """
+    return os.path.join(
+        f'Organisation Logo/{instance.organisation_name}/{date.today()}/{filename}')
+
+
+def get_user_profile_picture_path(instance, filename):
+    """
+    Returns a custom MEDIA path for profile picture uploaded by user
+    Eg: /MEDIA/User Profile Picture/xyz/user1/2019-02-06/image2.png
+    """
+    return os.path.join(
+        f'User Profile Picture/{instance.organisation_name}/{instance.user.username}/{date.today()}/{filename}')
 
 class Organisation(models.Model):
     """
@@ -19,7 +44,7 @@ class Organisation(models.Model):
         primary_key=True,
     )
     organisation_logo = models.ImageField(
-        upload_to='Organisation/Organisation Logo/%Y/%m/%d/',
+        upload_to=get_organisation_logo_path,
         null=True,
         blank=True,
         verbose_name="Organisation Logo"
@@ -52,7 +77,7 @@ class Profile(models.Model):
         null=True,
     )
     profile_picture = models.ImageField(
-        upload_to='Organisation/Employee Profile Picture/%Y/%m/%d/',
+        upload_to=get_user_profile_picture_path,
         null=True,
         blank=True,
         verbose_name="Employee Profile picture"
@@ -113,20 +138,27 @@ class File(models.Model):
 
     # Create a file instance
     >>> File.objects.create(uploaded_by=user_1, csv_file="file1.csv", uploaded_date = "Jan. 29, 2019, 7:59 p.m.")
+
+    Meta class------
+        1) declares a plural name for the 'File' object
     """
     uploaded_by = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
     )
     csv_file = models.FileField(
-        upload_to='Organisation/CSV File/%Y/%m/%d/',
+        upload_to=get_file_upload_path
     )
     uploaded_date = models.DateTimeField(
         default=datetime.now,
     )
 
     def filename(self):
-        return os.path.basename(self.csv_file.name) # pylint: disable = E1101
+        """
+        Returns the name of the csv file uploaded.
+        Usage: dashboard_user.html template
+        """
+        return os.path.basename(self.csv_file.name)  # pylint: disable = E1101
 
     class Meta:
         verbose_name_plural = 'CSV File Meta'

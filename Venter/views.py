@@ -35,7 +35,10 @@ def upload_csv_file(request):
             file_uploaded = csv_form.save(commit=False)
             file_uploaded.uploaded_by = request.user
             csv_form.save()
-            return HttpResponse("<h1>Your csv file was uploaded, redirect user to prediction page (pie charts, tables..)</h1>")
+            if request.user.is_staff:
+                return HttpResponseRedirect(reverse('dashboard_staff'))
+            else:
+                return HttpResponseRedirect(reverse('dashboard_user', args=(request.user.pk,)))
         else:
             return render(request, './Venter/upload_file.html', {'csv_form': csv_form})
     elif request.method == 'GET':
@@ -207,9 +210,43 @@ class CreateProfileView(CreateView):
         return render(request, './Venter/registration.html', {'user_form': user_form, 'profile_form': profile_form})
 
 class FilesByUserListView(generic.ListView):
+    """
+    Arguments------
+        1) ListView: View to display the files uploaded by the logged-in user
+
+    Functions------
+        1) get_queryset(): Returns a new QuerySet filtering files uploaded by the logged-in user
+    """
     model = File
     template_name = './Venter/dashboard_user.html'
     context_object_name = 'file_list'
 
     def get_queryset(self):
         return File.objects.filter(uploaded_by=self.request.user)
+
+class FilesByOrganisationListView(generic.ListView):
+    """
+    Arguments------
+        1) ListView: View to display the files uploaded by all the users of an organisation
+
+    Functions------
+        1) get_queryset(): Returns a new QuerySet filtering files uploaded by all the users of a particular organisation
+    """
+    model = File
+    template_name = './Venter/dashboard_staff.html'
+    context_object_name = 'file_list'
+
+    def get_queryset(self):
+        """
+        This function performs the following tasks in sequence:
+            1) get the organisation name of the logged-in satff member
+            2) get the profile of all the users belonging to that organisation
+            3) get the csv files of all those users in a list[]
+        """
+        org_name = self.request.user.profile.organisation_name
+        org_profiles = Profile.objects.filter(organisation_name=org_name)
+        files_list = []
+        for x in org_profiles:
+            files_list += File.objects.filter(uploaded_by=x.user)
+        return files_list
+        
