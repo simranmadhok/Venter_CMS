@@ -1,6 +1,20 @@
+"""Form fields validation
+
+This script performs validation of several form fields that require substantial LOC
+
+This python file can be imported and contains the following
+functions:
+    1) csv_file_header_validation - returns boolean result from csv file header validation
+"""
+
 from Venter.models import Header
 
 def csv_file_header_validation(uploaded_csv_file, request):
+    """
+    Validation of the header list extracted from the csv file's first row
+    against the header list of the logged-in user's organisation
+    """
+
     # extracting and converting the header from bytes to string format
     csv_header = uploaded_csv_file.readline()
     csv_str = str(csv_header, encoding='utf-8')
@@ -14,9 +28,10 @@ def csv_file_header_validation(uploaded_csv_file, request):
     csv_striped_list = [item.strip() for item in csv_list]
     csv_set = set(csv_striped_list)
 
-    # obtaining the organisation name of the logged in user
-    # this retrieves the header list for a particular organisation and casts it to a set
+    # obtaining the organisation name of the logged-in user
     org_name = request.user.profile.organisation_name
+
+    # this retrieves the header list for a particular organisation and casts it to a set
     model_header_list = Header.objects.filter(
         organisation_name=org_name).values_list('header', flat=True)
     header_set = set(model_header_list)

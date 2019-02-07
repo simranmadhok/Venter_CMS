@@ -39,6 +39,7 @@ class CSVForm(forms.ModelForm):
         if uploaded_csv_file:
             # validation of the filetype based on the extension type .csv
             # validation of the filesize based on the size limit 5MB
+            # the csv_file_header_validation() is invoked from validate.py
             filename = uploaded_csv_file.name
             if filename.endswith(settings.FILE_UPLOAD_TYPE):
                 if uploaded_csv_file.size < int(settings.MAX_UPLOAD_SIZE):
@@ -72,6 +73,7 @@ class UserForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ('username', 'password', 'email', 'first_name', 'last_name')
+        widget = forms.TextInput(attrs={'type' : 'password'})
 
     def save(self):  # pylint: disable = W0221
         user = super(UserForm, self).save(commit=False)
