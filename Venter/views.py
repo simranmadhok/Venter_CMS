@@ -249,4 +249,3 @@ class FilesByOrganisationListView(generic.ListView):
         for x in org_profiles:
             files_list += File.objects.filter(uploaded_by=x.user)
         return files_list
-        

@@ -73,7 +73,6 @@ class UserForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ('username', 'password', 'email', 'first_name', 'last_name')
-        widget = forms.TextInput(attrs={'type' : 'password'})
 
     def save(self):  # pylint: disable = W0221
         user = super(UserForm, self).save(commit=False)
