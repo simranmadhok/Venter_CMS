@@ -15,6 +15,10 @@
                 </li>
 
                 <li class="">
+                        <a class="btn" type="button" href="{% url 'upload_csv' %}"> Upload CSV File </a>
+                </li>
+
+                <li class="">
                     <a href="{% url 'logout' %}">
                         <span class="glyphicon glyphicon-off" aria-hidden="true"></span>&nbsp; Logout
                     </a>
@@ -24,9 +28,7 @@
     {% else %}
         <div class="collapse navbar-collapse" id="topNavBar">
             <ul class="nav navbar-nav navbar-right">
-                <li class="">
-                    <a href="{% url 'create_profile' %}">Register</a>
-                </li>
+                <li class="">Contact Us</li>
             </ul>
         </div>
     {% endif %}
@@ -34,12 +36,12 @@
 {% endblock %}
 {% block tabs %}
     {% if user.is_authenticated %}
-        <br><span color="white">
-            <a class="btn btn-info" type="button" href="{% url 'upload_csv' %}" style="float: right;" > Upload CSV File </a>
-        </span>
         {% if user.is_staff %}
             <span color="white">
                 <a class="btn btn-warning" type="button" href="{% url 'dashboard_staff' %}" style="float: right;" > Dashboard </a>
+            </span>
+            <span color="white">
+                <a class="btn btn-info" type="button" href="{% url 'register_employee' %}" style="float: right;" > Register Employee</a>
             </span>
         {% else %}
             <span color="white">

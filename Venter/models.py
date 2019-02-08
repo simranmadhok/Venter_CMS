@@ -2,6 +2,7 @@ import os
 from datetime import datetime, date
 
 from django.contrib.auth.models import User
+from django.core.validators import RegexValidator
 from django.db import models
 
 
@@ -80,11 +81,12 @@ class Profile(models.Model):
         upload_to=get_user_profile_picture_path,
         null=True,
         blank=True,
-        verbose_name="Employee Profile picture"
+        # verbose_name="Employee Profile picture"
     )
     phone_number = models.CharField(
         blank=True,
-        max_length=10
+        max_length=10,
+        validators=[RegexValidator(regex='^[6-9]\d{9}$', message='Please enter a valid phone number.')]
     )
 
     def __str__(self):

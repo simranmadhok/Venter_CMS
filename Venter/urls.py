@@ -12,8 +12,8 @@ urlpatterns = [
     path('logout/', views.user_logout, name='logout'),
     # ex: /venter/update_profile/5/
     path('update_profile/<int:pk>', views.UpdateProfileView.as_view(), name='update_profile'),
-    # ex: /venter/create_profile/
-    path('create_profile/', views.CreateProfileView.as_view(), name='create_profile'),
+    # ex: /venter/register_employee/
+    path('register_employee/', views.RegisterEmployeeView.as_view(), name='register_employee'),
     # ex: /venter/login/
     path('', include('django.contrib.auth.urls')),
     # ex: /venter/upload_csv/

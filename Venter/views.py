@@ -1,9 +1,9 @@
 import os
 
 from django.conf import settings
-from django.contrib import messages
 from django.contrib.auth import logout
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.models import User
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect, render
 from django.urls import reverse, reverse_lazy
@@ -156,58 +156,50 @@ class CategoryListView(LoginRequiredMixin, ListView):
 class UpdateProfileView(LoginRequiredMixin, UpdateView):
     """
     Arguments------
-        1) UpdateView: View to update the user profile details for the logged in user
+        1) UpdateView: View to update the user profile details for the logged-in user
         2) LoginRequiredMixin: Request to update profile details by non-authenticated users, will throw an HTTP 404 error
     """
     model = Profile
     success_url = reverse_lazy('home')
 
     def post(self, request, *args, **kwargs):
-        user_form = UserForm(request.POST, instance=request.user)
         profile_form = ProfileForm(request.POST, request.FILES, instance=request.user.profile)
-        if user_form.is_valid() and profile_form.is_valid(): # pylint: disable = R1705
-            user_form.save()
+        if profile_form.is_valid():
             profile_form.save()
-            messages.success(request, 'Your profile was successfully updated!')
             return HttpResponseRedirect(reverse_lazy('home'))
         else:
-            messages.error(request, 'Please correct the error below.')
+            return render(request, './Venter/update_profile.html', {'profile_form': profile_form})
 
     def get(self, request, *args, **kwargs):
-        user_form = UserForm(instance=request.user)
         profile_form = ProfileForm(instance=request.user.profile)
-        return render(request, './Venter/update_profile.html', {'user_form': user_form, 'profile_form': profile_form})
+        return render(request, './Venter/update_profile.html', {'profile_form': profile_form})
 
 
-class CreateProfileView(CreateView):
+class RegisterEmployeeView(CreateView):
     """
     Arguments------
-        1) CreateView: View to create the user profile for a new user.
+        1) CreateView: View to register a new user(employee) of an organisation.
     Note------
-        profile_form.save(commit=False) returns an instance of Profile that hasn't yet been saved to the database.
+        The organisation name for a newly registered employee is taken from the profile information of the staff member registering the employee.
         The profile.save() returns an instance of Profile that has been saved to the database.
         This occurs only after the profile is created for a new user with the 'profile.user = user'
     """
-    model = Profile
+    model = User
 
     def post(self, request, *args, **kwargs):
         user_form = UserForm(request.POST)
-        profile_form = ProfileForm(request.POST, request.FILES)
-        if user_form.is_valid() and profile_form.is_valid():
-            user = user_form.save()
-            profile = profile_form.save(commit=False)
-            profile.user = user
+        if user_form.is_valid():
+            userObj = user_form.save()
+            org_name = request.user.profile.organisation_name
+            profile = Profile.objects.create(user=userObj, organisation_name=org_name)
             profile.save()
-            return HttpResponseRedirect(reverse('home', args=[]))
+            return HttpResponseRedirect(reverse('dashboard_staff'))
         else:
-            messages.warning(
-                request, 'Something went wrong in Venter, please try again')
             return HttpResponse("<h1>NO Profile created</h1>")
 
     def get(self, request, *args, **kwargs):
         user_form = UserForm()
-        profile_form = ProfileForm()
-        return render(request, './Venter/registration.html', {'user_form': user_form, 'profile_form': profile_form})
+        return render(request, './Venter/registration.html', {'user_form': user_form})
 
 class FilesByUserListView(generic.ListView):
     """

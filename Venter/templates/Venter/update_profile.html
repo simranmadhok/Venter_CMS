@@ -5,10 +5,25 @@
 
     <form method="post" name="form" enctype="multipart/form-data">
         {% csrf_token %}
-        <!-- <label>Organization: </label>&nbsp;&nbsp;{{ request.user.profile.organisation_name }}<br> -->
-        {{ user_form.as_p }}
-        {{ profile_form.as_p }}
+        <label>Organization: </label>&nbsp;&nbsp;{{ request.user.profile.organisation_name }}<br>
+        <label>Username: </label>&nbsp;&nbsp;{{ request.user.username}}<br>
+        {% for field in profile_form %}
+            <label>{{ field.label }}: </label>&nbsp;
+            {{ field }}
+            <br>
+        {% endfor %}
         <input type="submit" value="Update">
     </form>
+
+{% if profile_form.errors %}
+    {% for field in profile_form %}
+        {% for error in field.errors %}
+        <br>
+            <div class="alert alert-danger">
+                <strong>{{ error|escape }}</strong>
+            </div>
+        {% endfor %}
+    {% endfor %}
+{% endif %}
 
 {% endblock %}

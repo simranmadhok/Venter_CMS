@@ -1,6 +1,5 @@
 from django import forms
 from django.contrib.auth.models import User
-
 from Backend import settings
 from Venter.models import File, Profile
 from .validate import csv_file_header_validation
@@ -96,4 +95,4 @@ class ProfileForm(forms.ModelForm):
     """
     class Meta:
         model = Profile
-        fields = ('organisation_name', 'phone_number', 'profile_picture')
+        fields = ('phone_number', 'profile_picture')
