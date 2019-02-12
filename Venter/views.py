@@ -1,9 +1,12 @@
+import datetime
 import os
 
+from django import forms
 from django.conf import settings
 from django.contrib.auth import logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
+from django.core.validators import validate_email
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect, render
 from django.urls import reverse, reverse_lazy
@@ -241,3 +244,41 @@ class FilesByOrganisationListView(generic.ListView):
         for x in org_profiles:
             files_list += File.objects.filter(uploaded_by=x.user)
         return files_list
+
+def contact_us(request):
+    """
+    View logic to email the administrator the contact details submitted by an organisation.
+    The contact details are submitted through the 'contact_us' template form.
+
+    For POST request-------
+        The contact details of an organisation are collected in the form.
+        The email and phone number validation is performed.
+        The formd details are packed together in the body of the email.
+        An email is sent to the website administrator.
+    For GET request-------
+        The contact_us template is rendered
+    """
+    if request.method == 'POST':
+        company_name = request.POST.get('company_name')
+        contact_no = request.POST.get('contact_no')
+        email = request.POST.get('email')
+        requirement_details = request.POST.get('requirement_details')
+
+        try:
+            validate_email(email)
+            # validate phone number
+            # get current date and time
+            now = datetime.datetime.now()
+            print(now.strftime("%Y-%m-%d %H:%M"))
+            date_time = now.strftime("%Y-%m-%d %H:%M")
+            # prepare email_body
+            email_body = "Dear Admin,\n\n Following are the inquiry details:\n\n Inquiry Date and Time: "+date_time+"\n Company Name: "+company_name+"\n Contact Number: "+contact_no+"\n Email address: "+email+"\n Requirement Details: "+requirement_details+"\n\n"
+            print(email_body)
+            # use send_mail() to submit form details to the administrator
+            return HttpResponse('<h3>Details submitted</h3>')
+        except forms.ValidationError:
+            error_message = "Please enter a valid email address"
+            return render(request, './Venter/contact_us.html', {
+                'error_message': error_message})
+    elif request.method == 'GET':
+        return render(request, './Venter/contact_us.html')

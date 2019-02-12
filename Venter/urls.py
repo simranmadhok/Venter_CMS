@@ -26,5 +26,7 @@ urlpatterns = [
     path('dashboard_user/<int:pk>', views.FilesByUserListView.as_view(), name='dashboard_user'),
     # ex: /venter/dashboard_staff/
     path('dashboard_staff/', views.FilesByOrganisationListView.as_view(), name='dashboard_staff'),
+    # ex: /venter/contact_us/
+    path('contact_us/', views.contact_us, name='contact_us'),
     path('predict/checkOutput/', views.handle_user_selected_data, name='checkOutput'),
 ]
