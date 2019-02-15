@@ -1,10 +1,9 @@
-{% extends 'Login/header.html' %}
+{% extends 'Venter/base.html' %}
 {% block title %}Dashboard{% endblock %}
 {% block content %}
 
 {% if file_list %}
-<h3 style="font-family: 'Times New Roman'; text-align: center;"><b>Dashboard</b></h3>
-<br>
+<br><br>
 <a href="{% url 'upload_csv' %}"><button type="button" class="btn btn-primary" style="float: right"><span class="glyphicon glyphicon-plus"></span>&nbsp;&nbsp;Upload CSV File</button></a>
 <br>
 <table class="table table-hover">

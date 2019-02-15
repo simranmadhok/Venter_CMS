@@ -1,8 +1,7 @@
-{% extends 'Login/header.html' %}
+{% extends 'Venter/base.html' %}
 {% block title %}Update Profile{% endblock %}
-{% block link %}{% url 'home' %} {% endblock %}
-{% block verified %}
-
+{% block content %}
+<br><br>
     <form method="post" name="form" enctype="multipart/form-data">
         {% csrf_token %}
         <label>Organization: </label>&nbsp;&nbsp;{{ request.user.profile.organisation_name }}<br>

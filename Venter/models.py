@@ -1,35 +1,12 @@
 import os
-from datetime import datetime, date
+from datetime import datetime
 
 from django.contrib.auth.models import User
 from django.core.validators import RegexValidator
 from django.db import models
 
+from .helpers import get_file_upload_path, get_organisation_logo_path, get_user_profile_picture_path
 
-def get_file_upload_path(instance, filename):
-    """
-    Returns a custom MEDIA path for files uploaded by a user
-    Eg: /MEDIA/CSV Files/xyz/user1/2019-02-06/file1.csv
-    """
-    return os.path.join(
-        f'CSV Files/{instance.uploaded_by.profile.organisation_name}/{instance.uploaded_by.profile.user.username}/{instance.uploaded_date.date()}/{filename}')
-
-def get_organisation_logo_path(instance, filename):
-    """
-    Returns a custom MEDIA path for organisation logo uploaded by staff member
-    Eg: /MEDIA/Organisation Logo/xyz/2019-02-06/image1.png
-    """
-    return os.path.join(
-        f'Organisation Logo/{instance.organisation_name}/{date.today()}/{filename}')
-
-
-def get_user_profile_picture_path(instance, filename):
-    """
-    Returns a custom MEDIA path for profile picture uploaded by user
-    Eg: /MEDIA/User Profile Picture/xyz/user1/2019-02-06/image2.png
-    """
-    return os.path.join(
-        f'User Profile Picture/{instance.organisation_name}/{instance.user.username}/{date.today()}/{filename}')
 
 class Organisation(models.Model):
     """
@@ -65,7 +42,7 @@ class Profile(models.Model):
 
     # Create a user profile
     >>> prof_1 = Profile.objects.create(user=user_1, organisation_name="abc", profile_picture="image2.png")
-    >>> prof_2 = Profile.objects.create(user=user_2, organisation_name="abc", phone_number="9999999999")
+    >>> prof_2 = Profile.objects.create(user=user_2, organisation_name="abc", phone_number="9898121212")
     """
     user = models.OneToOneField(
         User,
@@ -81,14 +58,13 @@ class Profile(models.Model):
         upload_to=get_user_profile_picture_path,
         null=True,
         blank=True,
-        # verbose_name="Employee Profile picture"
     )
     phone_number = models.CharField(
         blank=True,
         max_length=10,
-        validators=[RegexValidator(regex='^[6-9]\d{9}$', message='Please enter a valid phone number.')]
+        validators=[RegexValidator(
+            regex='^[6-9]\\d{9}$', message='Please enter a valid phone number')]
     )
-
     def __str__(self):
         return self.user.username  # pylint: disable = E1101
 
@@ -143,6 +119,10 @@ class File(models.Model):
 
     Meta class------
         1) declares a plural name for the 'File' object
+
+    Permissions------
+        1) view_organisation_files: Grants permission only to staff members to access 'dashboard_staff.html' template
+        2) view_self_files: Grants permission only to authenticated users to access 'dashboard_user.html' template
     """
     uploaded_by = models.ForeignKey(
         User,
@@ -163,4 +143,8 @@ class File(models.Model):
         return os.path.basename(self.csv_file.name)  # pylint: disable = E1101
 
     class Meta:
-        verbose_name_plural = 'CSV File Meta'
+        verbose_name_plural = 'CSV File'
+        permissions = (
+            ("view_organisation_files", "Can view organisation files"),
+            ("view_self_files", "Can view files uploaded by self"),
+        )

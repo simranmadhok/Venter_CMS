@@ -30,7 +30,6 @@ ALLOWED_HOSTS = ["https://venteriitb.azurewebsites.net", "*"]
 
 INSTALLED_APPS = [
     'Venter',
-    'Login.apps.LoginConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -109,21 +108,19 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATIC_URL = '/static/'
+
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "./Login/static"),
+    os.path.join(BASE_DIR, "static"),
 ]
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-LOGIN_REDIRECT_URL = 'home'
+MEDIA_ROOT = os.path.join(BASE_DIR, "MEDIA/")
+
+LOGIN_REDIRECT_URL = 'upload_csv'
 
 EMAIL_BACKEND = "django.core.mail.backends.filebased.EmailBackend"
 EMAIL_FILE_PATH = os.path.join(BASE_DIR, "sent_emails")
-
-# Data folder stores the data of all users
-MEDIA_ROOT = os.path.join(BASE_DIR, "MEDIA/")
 
 # Maximum size of file uploaded by user
 # 5242880 = 5 MB

@@ -1,8 +1,11 @@
 from django import forms
 from django.contrib.auth.models import User
+
 from Backend import settings
 from Venter.models import File, Profile
+
 from .validate import csv_file_header_validation
+
 
 class CSVForm(forms.ModelForm):
     """
@@ -46,7 +49,7 @@ class CSVForm(forms.ModelForm):
                         return uploaded_csv_file
                     else:
                         raise forms.ValidationError(
-                            "Incorrect headers, please contact your administrator")
+                            "Incorrect headers detected, please upload correct file")
                 else:
                     raise forms.ValidationError(
                         "File size must not exceed 5 MB")
@@ -73,14 +76,6 @@ class UserForm(forms.ModelForm):
         model = User
         fields = ('username', 'password', 'email', 'first_name', 'last_name')
 
-    def save(self):  # pylint: disable = W0221
-        user = super(UserForm, self).save(commit=False)
-        password = self.cleaned_data.get('password')
-        user.set_password(password)
-        user.save()
-        return user
-
-
 class ProfileForm(forms.ModelForm):
     """
     Modelform, generated from Django's Profile model.
@@ -91,7 +86,8 @@ class ProfileForm(forms.ModelForm):
 
     Usage------
         1) 'registration.html' template: Generates the profile form fields in the signup page for new users
-        2) 'update_profile.html' template: Generates the profile form fields in the update profile page for existing users
+        2) 'update_profile.html' template: Generates the profile form fields in the update profile page
+        for existing users
     """
     class Meta:
         model = Profile

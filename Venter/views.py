@@ -1,11 +1,17 @@
 import datetime
 import os
+import re
 
 from django import forms
 from django.conf import settings
 from django.contrib.auth import logout
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import (LoginRequiredMixin,
+                                        PermissionRequiredMixin)
 from django.contrib.auth.models import User
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
+from django.core.mail import send_mail
 from django.core.validators import validate_email
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect, render
@@ -21,6 +27,7 @@ from Venter.models import Category, File, Profile
 from .manipulate_csv import EditCsv
 
 
+@login_required
 def upload_csv_file(request):
     """
     View logic for uploading CSV file by a logged in user.
@@ -47,6 +54,7 @@ def upload_csv_file(request):
     elif request.method == 'GET':
         csv_form = CSVForm(request=request)
         return render(request, './Venter/upload_file.html', {'csv_form': csv_form})
+
 
 def handle_user_selected_data(request):
     """This function is used to handle the selected categories by the user"""
@@ -138,17 +146,19 @@ def handle_uploaded_file(f, username, filename):
 
 def user_logout(request):
     logout(request)
-    return redirect(settings.LOGIN_REDIRECT_URL)
+    return redirect('login')
 
 
 class CategoryListView(LoginRequiredMixin, ListView):
     """
     Arguments------
-        1) ListView: View to display the category list for the organisation to which the logged in user belongs
-        2) LoginRequiredMixin: Request to update profile details by non-authenticated users, will throw an HTTP 404 error
+        1) LoginRequiredMixin: Request to update profile details by non-authenticated users,
+        will throw an HTTP 404 error
+        2) ListView: View to display the category list for the organisation to which the logged-in user belongs
 
     Functions------
-        1) get_queryset(): Returns a new QuerySet filtering categories based on the organisation name passed in the parameter.
+        1) get_queryset(): Returns a new QuerySet filtering categories
+        based on the organisation name passed in the parameter.
     """
     model = Category
 
@@ -160,16 +170,22 @@ class UpdateProfileView(LoginRequiredMixin, UpdateView):
     """
     Arguments------
         1) UpdateView: View to update the user profile details for the logged-in user
-        2) LoginRequiredMixin: Request to update profile details by non-authenticated users, will throw an HTTP 404 error
+        2) LoginRequiredMixin: Request to update profile details by non-authenticated users,
+        will throw an HTTP 404 error
     """
     model = Profile
     success_url = reverse_lazy('home')
 
     def post(self, request, *args, **kwargs):
-        profile_form = ProfileForm(request.POST, request.FILES, instance=request.user.profile)
+        profile_form = ProfileForm(
+            request.POST, request.FILES, instance=request.user.profile)
         if profile_form.is_valid():
             profile_form.save()
-            return HttpResponseRedirect(reverse_lazy('home'))
+            # add alert message 'Profile details updated! with green tick mark symbol, then redirect to dashboard'
+            if request.user.is_staff:
+                return HttpResponseRedirect(reverse('dashboard_staff'))
+            else:
+                return HttpResponseRedirect(reverse('dashboard_user', args=(request.user.pk,)))
         else:
             return render(request, './Venter/update_profile.html', {'profile_form': profile_form})
 
@@ -178,36 +194,53 @@ class UpdateProfileView(LoginRequiredMixin, UpdateView):
         return render(request, './Venter/update_profile.html', {'profile_form': profile_form})
 
 
-class RegisterEmployeeView(CreateView):
+class RegisterEmployeeView(LoginRequiredMixin, CreateView):
     """
     Arguments------
         1) CreateView: View to register a new user(employee) of an organisation.
     Note------
-        The organisation name for a newly registered employee is taken from the profile information of the staff member registering the employee.
-        The profile.save() returns an instance of Profile that has been saved to the database.
-        This occurs only after the profile is created for a new user with the 'profile.user = user'
+        1) The organisation name for a newly registered employee is taken from
+           the profile information of the staff member registering the employee.
+        2) The profile.save() returns an instance of Profile that has been saved to the database.
+            This occurs only after the profile is created for a new user with the 'profile.user = user'
+        3) The validate_password() is an in-built password validator in Django
+        #module-django.contrib.auth.password_validation
+        Ref: https://docs.djangoproject.com/en/2.1/topics/auth/passwords/
     """
     model = User
 
     def post(self, request, *args, **kwargs):
         user_form = UserForm(request.POST)
         if user_form.is_valid():
-            userObj = user_form.save()
-            org_name = request.user.profile.organisation_name
-            profile = Profile.objects.create(user=userObj, organisation_name=org_name)
-            profile.save()
-            return HttpResponseRedirect(reverse('dashboard_staff'))
+            userObj = user_form.save(commit=False)
+            password = user_form.cleaned_data.get('password')
+            try:
+                validate_password(password, userObj)
+                userObj.set_password(password)
+                userObj.save()
+                org_name = request.user.profile.organisation_name
+                profile = Profile.objects.create(
+                    user=userObj, organisation_name=org_name)
+                profile.save()
+                # add alert message 'Registration successfull! with green tick mark symbol, then redirect to dashboard'
+                return HttpResponseRedirect(reverse('dashboard_staff'))
+            except ValidationError as e:
+                user_form.add_error('password', e)
+                return render(request, './Venter/registration.html', {'user_form': user_form})
         else:
-            return HttpResponse("<h1>NO Profile created</h1>")
+            return render(request, './Venter/registration.html', {'user_form': user_form})
 
     def get(self, request, *args, **kwargs):
         user_form = UserForm()
         return render(request, './Venter/registration.html', {'user_form': user_form})
 
-class FilesByUserListView(generic.ListView):
+
+class FilesByUserListView(LoginRequiredMixin, PermissionRequiredMixin, generic.ListView):
     """
     Arguments------
-        1) ListView: View to display the files uploaded by the logged-in user
+        1) LoginRequiredMixin: View to redirect non-authenticated users to show HTTP 403 error
+        2) PermissionRequiredMixin: View to check whether the user has permission to access files uploaded by self
+        3) ListView: View to display the files uploaded by the logged-in user
 
     Functions------
         1) get_queryset(): Returns a new QuerySet filtering files uploaded by the logged-in user
@@ -215,14 +248,19 @@ class FilesByUserListView(generic.ListView):
     model = File
     template_name = './Venter/dashboard_user.html'
     context_object_name = 'file_list'
+    permission_required = 'Venter.view_self_files'
 
     def get_queryset(self):
         return File.objects.filter(uploaded_by=self.request.user)
 
-class FilesByOrganisationListView(generic.ListView):
+
+class FilesByOrganisationListView(LoginRequiredMixin, PermissionRequiredMixin, generic.ListView):
     """
     Arguments------
-        1) ListView: View to display the files uploaded by all the users of an organisation
+        1) LoginRequiredMixin: View to redirect non-authenticated users to show HTTP 403 error
+        2) PermissionRequiredMixin: View to check whether the user is a staff
+        having permission to access organisation files
+        3) ListView: View to display the files uploaded by all the users of an organisation
 
     Functions------
         1) get_queryset(): Returns a new QuerySet filtering files uploaded by all the users of a particular organisation
@@ -230,6 +268,7 @@ class FilesByOrganisationListView(generic.ListView):
     model = File
     template_name = './Venter/dashboard_staff.html'
     context_object_name = 'file_list'
+    permission_required = 'Venter.view_organisation_files'
 
     def get_queryset(self):
         """
@@ -244,6 +283,7 @@ class FilesByOrganisationListView(generic.ListView):
         for x in org_profiles:
             files_list += File.objects.filter(uploaded_by=x.user)
         return files_list
+
 
 def contact_us(request):
     """
@@ -265,17 +305,28 @@ def contact_us(request):
         requirement_details = request.POST.get('requirement_details')
 
         try:
+            # validate email address
             validate_email(email)
-            # validate phone number
-            # get current date and time
-            now = datetime.datetime.now()
-            print(now.strftime("%Y-%m-%d %H:%M"))
-            date_time = now.strftime("%Y-%m-%d %H:%M")
-            # prepare email_body
-            email_body = "Dear Admin,\n\n Following are the inquiry details:\n\n Inquiry Date and Time: "+date_time+"\n Company Name: "+company_name+"\n Contact Number: "+contact_no+"\n Email address: "+email+"\n Requirement Details: "+requirement_details+"\n\n"
-            print(email_body)
-            # use send_mail() to submit form details to the administrator
-            return HttpResponse('<h3>Details submitted</h3>')
+            # validate contact number with regex expression
+            pattern = re.compile('^[6-9]\\d{9}$')
+            if bool(pattern.match(contact_no)):
+                # get current date and time
+                now = datetime.datetime.now()
+                print(now.strftime("%Y-%m-%d %H:%M"))
+                date_time = now.strftime("%Y-%m-%d %H:%M")
+                email_body = "Dear Admin,\n\n Following are the inquiry details:\n\n " + \
+                    "Inquiry Date and Time: "+date_time+"\n Company Name: " + \
+                    company_name+"\n Contact Number: "+contact_no+"\n Email address: " + \
+                    email+"\n Requirement Details: "+requirement_details+"\n\n"
+                print(email_body)
+
+                # use send_mail() to submit form details to the administrator
+                send_mail('Venter Inquiry', email_body, 'from@example.com', ['madhok.simran8@gmail.com'], fail_silently=False)
+                return HttpResponse('<h3>Details submitted</h3>')
+            else:
+                error_message = "Please enter a valid phone number"
+                return render(request, './Venter/contact_us.html', {
+                    'error_message': error_message})
         except forms.ValidationError:
             error_message = "Please enter a valid email address"
             return render(request, './Venter/contact_us.html', {

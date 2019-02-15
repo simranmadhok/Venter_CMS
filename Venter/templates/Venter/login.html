@@ -1,0 +1,72 @@
+{% extends 'Venter/index.html' %}
+{% block title %}Login {% endblock %}
+{% block content %}
+
+    <div class="w3ls-login">
+        <form method="post">
+            <div class="agile-field-txt">
+                {% csrf_token %}
+                <label for="id_username">
+                    <i class="fa fa-user" aria-hidden="true"></i>Username :</label>
+                <input type="text" name="username" value=""
+                       autofocus=""
+                       maxlength="254" required="" id="id_username">
+            </div>
+            <div class="agile-field-txt">
+                <label for="id_password">
+                    <i class="fa fa-lock" aria-hidden="true"></i>Password :</label>
+                <input type="password" name="password" required=""
+                       id="id_password">
+                <div class="agile_label">
+                    <input id="check3" name="check3" type="checkbox" value="show password" onclick="myFunction()">
+                    <label class="check" for="check3">Show password</label>
+                </div>
+            </div>
+            <script>
+                function myFunction() {
+                    var x = document.getElementById("id_password");
+                    if (x.type === "password") {
+                        x.type = "text";
+                    } else {
+                        x.type = "password";
+                    }
+                }
+            </script>
+            <style>
+                h2{
+                    text-align: center;
+                    color:#78A05A;
+                    font-size:40px;
+                }
+                .landingtext {
+                    background: rgba(143, 143, 143, 0.80);
+                    padding: 15px;
+                    width: 65%;
+                    text-align: left;
+                    border-radius: 25px;
+                    font-size: 20px;
+                 }
+                .font{
+                    font-family: 'Montserrat', sans-serif;
+                    text-shadow:
+                    -1px -1px 0 #000,
+                    1px -1px 0 #000,
+                    -1px 1px 0 #000,
+                    1px 1px 0 #000;
+                }
+            </style>
+            <!-- //script for show password -->
+            <div class="w3ls-login  w3l-sub">
+                <input type="submit" value="Login">
+            </div>
+        </form>
+    </div>
+
+    {% if form.errors %}
+        <div class="alert alert-danger">
+            <p>Please enter a correct username and password. Note that both fields may be
+                case-sensitive.</p>
+        </div>
+    {% endif %}
+
+{% endblock %}

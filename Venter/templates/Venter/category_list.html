@@ -1,10 +1,9 @@
-{% extends 'Login/header.html' %}
+{% extends 'Venter/base.html' %}
 {% block title %}Category List{% endblock %}
-{% block link %}{% url 'home' %} {% endblock %}
-{% block verified %}
+{% block content %}
 
-<h1>Category List</h1>
   {% if category_list %}
+  <br><br>
     <ul>
         {% for c in category_list %}
         <li>
@@ -13,4 +12,5 @@
         {% endfor %}
     </ul>
   {% endif %} 
+  
 {% endblock %}

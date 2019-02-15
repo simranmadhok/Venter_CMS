@@ -1,13 +1,14 @@
-from django.urls import include, path
+from django.contrib.auth import views as auth_views
+from django.urls import path
 from django.views.generic import TemplateView
 
 from . import views
 
 urlpatterns = [
     # ex: /venter/
-    path('', TemplateView.as_view(template_name='Login/home.html'), name='home'),
+    path('', TemplateView.as_view(template_name='Venter/home.html'), name='home'),
     # ex: /venter/home/
-    path('home/', TemplateView.as_view(template_name='Login/home.html'), name='home'),
+    path('home/', TemplateView.as_view(template_name='Venter/home.html'), name='home'),
     # ex: /venter/logout/
     path('logout/', views.user_logout, name='logout'),
     # ex: /venter/update_profile/5/
@@ -15,7 +16,7 @@ urlpatterns = [
     # ex: /venter/register_employee/
     path('register_employee/', views.RegisterEmployeeView.as_view(), name='register_employee'),
     # ex: /venter/login/
-    path('', include('django.contrib.auth.urls')),
+    path('login/', auth_views.LoginView.as_view(template_name="Venter/login.html"), name='login'),
     # ex: /venter/upload_csv/
     path('upload_csv/', views.upload_csv_file, name='upload_csv'),
     # ex: /venter/download/
