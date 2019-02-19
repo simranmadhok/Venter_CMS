@@ -83,12 +83,14 @@ class ImportGraph():
                 complaint_text_tokens.append(token.strip())
         return complaint_text_tokens
 
-    def process_query(self, line):
-        tokens = self.get_clean_complaint_text_words(line)
-        vec = np.zeros(shape=300)
-        for token in tokens:
-            vec += self.vecs.word_vec(token)
-        if len(tokens) != 0:
-            vec /= len(tokens)
-        data = np.asarray(vec)
-        return [data]
+    def process_query(self, data):
+        processes_data = []
+        for line in data:
+            tokens = self.get_clean_complaint_text_words(line)
+            vec = np.zeros(shape=300)
+            for token in tokens:
+                vec += self.vecs.word_vec(token)
+            if len(tokens) != 0:
+                vec /= len(tokens)
+            processes_data.append(np.asarray(vec))
+        return np.array(processes_data)

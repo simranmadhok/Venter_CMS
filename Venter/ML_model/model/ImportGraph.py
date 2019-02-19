@@ -168,25 +168,23 @@ class ImportGraph:
         # The 'x' corresponds to name of input placeholder
         return self.sess.run(self.probs, feed_dict={self.X: data})
 
-    def process_query(self, line, flag):
+    def process_query(self, data, flag):
+        processes_data = []
+        for line in data:
+            if flag == 1:
+                tokens = TweetTokenizer().tokenize(line.strip())
+            else:
+                tokens = line.strip().split()
+            indices = []
+            clean_words = []
+            for token in tokens:
+                if token.strip() in self.word_index_map.keys():
+                    indices.append(self.word_index_map[token.strip()])
+                    clean_words.append(token.strip())
+            if len(indices) < 100:
+                indices += [self.last_index] * (self.max_padded_sentence_length - len(indices))
+            else:
+                continue
+            processes_data.append(np.asarray(indices))
 
-        if flag == 1:
-            tokens = TweetTokenizer().tokenize(line.strip())
-        else:
-            tokens = line.strip().split()
-        indices = []
-        clean_words = []
-        for token in tokens:
-            if token.strip() in self.word_index_map.keys():
-                indices.append(self.word_index_map[token.strip()])
-                clean_words.append(token.strip())
-        if len(indices) < 100:
-            indices += [self.last_index] * (self.max_padded_sentence_length - len(indices))
-        else:
-            return ""
-        indices = np.asarray(indices)
-        data = []
-        data.append(indices)
-        data = np.asarray(data)
-
-        return data
+        return np.array(processes_data)

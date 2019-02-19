@@ -33,20 +33,7 @@ class ClassificationService:
 
     def get_top_3_cats_with_prob(self, data):
         prob1 = self.get_probs_graph(0, data, flag=1)
-
-        final_prob = prob1[0]  # + prob2 + prob3 + prob4 + prob5 + prob6 + prob7
-
-        final_sorted = np.argsort(final_prob)
-
-        final_categories = []
-        final_probability = []
-        # , float(final_prob[final_sorted[-3:][2-i]]/7)
-        for i in range(3):
-            final_categories.append(self.index_complaint_title_map[final_sorted[-3:][2 - i]])
-            final_probability.append(float(final_prob[final_sorted[-3:][2 - i]]))
-
-        result = {}
-
-        for i in range(len(final_categories)):
-            result[final_categories[i]] = final_probability[i]
-        return result
+        final_sorted = np.argsort(prob1)[::-1]
+        # Returns list of size [batch_size] where each list member is dict with 3 key-value pair
+        return [{self.index_complaint_title_map[x]: float(prob1[i, x]) for x in final_sorted[i, :3]} for i in
+                range(len(final_sorted))]

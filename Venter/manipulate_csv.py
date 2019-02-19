@@ -138,82 +138,48 @@ class EditCsv:
     def read_file(self):
         """This method will predict the categories from the data of the csv file with encoding='utf-8' for MCGM"""
         # Reading the csvfile through pandas
-        csvfile = pd.read_csv(settings.MEDIA_ROOT + "/" + self.username + "/CSV/input" + "/" + self.filename, sep=',',
+        data = pd.read_csv(settings.MEDIA_ROOT + "/" + self.username + "/CSV/input" + "/" + self.filename, sep=',',
                               header=0, encoding='utf-8')
 
         dict_list = []  # Structure is given at the top.
-        description = []  # To check if there is a description in the file/row or not
-        # These lists will be used for creating the difference file
-        cat1 = []
-        cat2 = []
-        cat3 = []
 
-        for row in csvfile.iterrows():
-            # Iterate to each row of the file to separate the categories, title and description with the rest of the data
-            dict = {}  # Each row will be a dictionary (See above mentioned structure for reference
-            index, data = row  # Separating Index and data from the rows, Index will be used to map the category corresponding to which row
-            dict['index'] = index
-            if self.group == "ICMC":
-                # Categories (as mentioned earlier) will be different for each group
-                complaint_title = data['complaint_title']
-                # We are separating description to show it in the frontend for the clients
-                complaint_description = data['complaint_description']
-                description.append(complaint_description)
-                dict['problem_description'] = complaint_description
-                try:
-                    # The ML model will take complaint_title which is a list as an input
-                    # and gives categories in an dictionary format like:
-                    # cats = {'category1':80, 'category2':10, 'category3':10}
-                    cats = self.cs.get_top_3_cats_with_prob(complaint_title)
-                except Exception as e:
-                    break
+        if self.group == "ICMC":
+            complaint_description = data['complaint_description']
+            try:
+                # The ML model will take complaint_title which is a list as an input
+                # and gives categories in an dictionary format like:
+                # cats = {'category1':80, 'category2':10, 'category3':10}
+                cats = self.cs.get_top_3_cats_with_prob(complaint_description)
+            except Exception as e:
+                pass
+        else:
+            data = data.dropna(subset=["text"])
+            complaint_description = data['text']
+            cats = self.cs.get_top_3_cats_with_prob(complaint_description)
 
-            elif self.group == "SpeakUP":
-                # Just like ICMC, SpeakUp will have different categories.
-                # The ML model will get 'text' field as a list in input
-                complaint_title = str(data['text'])
-                if complaint_title != 'nan':
-                    dict['problem_description'] = complaint_title
-                    description.append(complaint_title)
-                    cats = self.cs.get_top_3_cats_with_prob(complaint_title)
-                else:
-                    # There maybe a case where there is nothing in the text field, in that case the ML model will not predict for that row
-                    description.append("Problem description not found")
-                    dict['problem_description'] = "Problem description not found"
-                    cats = {'None': 1}
+        df = pd.DataFrame(cats)
+        df["complaint"] = complaint_description
+        df.columns = ['Predicted category 1','Predicted category 2','Predicted category 3','Complaint Description']
 
-            for k in cats:
-                # In ICMC, there are 2 categories which are being prdicted in marathi.
-                # This iteration replaces marathi with english
-                # Source: https://stackoverflow.com/questions/4406501/change-the-name-of-a-key-in-dictionary
-                cats[k] = int(cats[k] * 100)
-                if k == 'मॅनहोलमध्ये व्यक्ती पडणे':
-                    temp = cats[k]
-                    cats["Person falling in Manhole"] = temp / 100
-                    del cats['मॅनहोलमध्ये व्यक्ती पडणे']
-
-                elif k == 'थकबाकी येणे बाकी':
-                    temp = cats[k]
-                    cats["Outstanding dues pending"] = temp / 100
-                    del cats['थकबाकी येणे बाकी']
-
-            # The dictionary (cats) from the ML model was not sorted based it's values (accuracy percentage)
-            sorted_cats = sorted(cats.items(), key=operator.itemgetter(1), reverse=True)
-
-            # Lists for Difference File
-            cat1.append(sorted_cats[0][0])
-            cat2.append(sorted_cats[1][0])
-            cat3.append(sorted_cats[2][0])
-
-            dict['category'] = sorted_cats
-            dict_list.append(dict)
-
-        df = pd.DataFrame({'Predicted category 1': cat1, 'Predicted category 2': cat2, 'Predicted category 3': cat3,
-                           'Complaint Description': description})
+            # No idea why code is there.
+            # for k in cats:
+            #     # In ICMC, there are 2 categories which are being prdicted in marathi.
+            #     # This iteration replaces marathi with english
+            #     # Source: https://stackoverflow.com/questions/4406501/change-the-name-of-a-key-in-dictionary
+            #     cats[k] = int(cats[k] * 100)
+            #     if k == 'मॅनहोलमध्ये व्यक्ती पडणे':
+            #         temp = cats[k]
+            #         cats["Person falling in Manhole"] = temp / 100
+            #         del cats['मॅनहोलमध्ये व्यक्ती पडणे']
+            #
+            #     elif k == 'थकबाकी येणे बाकी':
+            #         temp = cats[k]
+            #         cats["Outstanding dues pending"] = temp / 100
+            #         del cats['थकबाकी येणे बाकी']
 
         df.to_csv(os.path.join(settings.MEDIA_ROOT, self.username, "CSV", "output", "Difference.csv"), sep=',',
                   encoding='utf-8', index=False)
 
         # After doing everything, don't forget to delete the object reference of the ClassificationService class
         del self.cs
-        return dict_list, csvfile.shape[0]
+        return dict_list, data.shape[0]
