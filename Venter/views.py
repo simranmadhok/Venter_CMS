@@ -26,7 +26,6 @@ from Venter.models import Category, File, Profile
 
 from .manipulate_csv import EditCsv
 
-
 @login_required
 @never_cache
 def upload_csv_file(request):
@@ -56,98 +55,97 @@ def upload_csv_file(request):
         csv_form = CSVForm(request=request)
         return render(request, './Venter/upload_file.html', {'csv_form': csv_form})
 
-
-def handle_user_selected_data(request):
-    """This function is used to handle the selected categories by the user"""
-    if not request.user.is_authenticated:
-        # Authentication security check
-        return redirect(settings.LOGIN_REDIRECT_URL)
-    else:
-        rows = request.session['Rows']
-        correct_category = []
-        company = request.session['company']
-        if request.method == 'POST':
-            file_name = request.session['filename']
-            user_name = request.user.username
-            for i in range(rows):
-                # We are getting a list of values because the select tag was multiple select
-                selected_category = request.POST.getlist(
-                    'select_category' + str(i) + '[]')
-                if request.POST['other_category' + str(i)]:
-                    # To get a better picture of what we are getting try to print "request.POST.['other_category' + str(i)]", request.POST['other_category' + str(i)
-                    # others_list=request.POST['other_category' + str(i)]
-                    # for element in others_list:
-                    #     print(element)
-                    #     tuple = (selected_category,element)
-                    tuple = (selected_category,
-                             request.POST['other_category' + str(i)])
-                    # print(request.POST['other_category' + str(i)])
-                    # print(tuple)
-                    # So here the correct_category will be needing a touple so the data will be like:
-                    # [(selected_category1, selected_category2), (other_category1, other_category2)] This will be the output of the multi select
-                    correct_category.append(tuple)
-                else:
-                    # So here the correct_category will be needing a touple so the data will be like:
-                    # [(selected_category1, selected_category2)] This will be the output of the multi select
-                    correct_category.append(selected_category)
-        csv = EditCsv(file_name, user_name, company)
-        csv.write_file(correct_category)
-        if request.POST['radio'] != "no":
-            # If the user want to send the file to Google Drive
-            path_folder = request.user.username + "/CSV/output/"
-            path_file = 'MEDIA/' + request.user.username + \
-                "/CSV/output/" + request.session['filename']
-            path_file_diff = 'MEDIA/' + request.user.username + "/CSV/output/Difference of " + request.session[
-                'filename']
-            upload_to_google_drive.upload_to_drive(path_folder,
-                                                   'results of ' +
-                                                   request.session['filename'],
-                                                   "Difference of " +
-                                                   request.session['filename'],
-                                                   path_file,
-                                                   path_file_diff)
-    return redirect("/download")
-
-
-def file_download(request):
-    if not request.user.is_authenticated:
-        return redirect(settings.LOGIN_REDIRECT_URL)
-    else:
-        # Refer to the source: https://stackoverflow.com/questions/36392510/django-download-a-file/36394206
-        path = os.path.join(settings.MEDIA_ROOT, request.user.username,
-                            "CSV", "output", request.session['filename'])
-        with open(path, 'rb') as csv:
-            response = HttpResponse(
-                csv.read())  # Try using HttpStream instead of this. This method will create problem with large numbers of rows like 25k+
-            response['Content-Type'] = 'application/force-download'
-            response['Content-Disposition'] = 'attachment;filename=results of ' + \
-                request.session['filename']
-        return response
+# def handle_user_selected_data(request):
+#     """This function is used to handle the selected categories by the user"""
+#     if not request.user.is_authenticated:
+#         # Authentication security check
+#         return redirect(settings.LOGIN_REDIRECT_URL)
+#     else:
+#         rows = request.session['Rows']
+#         correct_category = []
+#         company = request.session['company']
+#         if request.method == 'POST':
+#             file_name = request.session['filename']
+#             user_name = request.user.username
+#             for i in range(rows):
+#                 # We are getting a list of values because the select tag was multiple select
+#                 selected_category = request.POST.getlist(
+#                     'select_category' + str(i) + '[]')
+#                 if request.POST['other_category' + str(i)]:
+#                     # To get a better picture of what we are getting try to print "request.POST.['other_category' + str(i)]", request.POST['other_category' + str(i)
+#                     # others_list=request.POST['other_category' + str(i)]
+#                     # for element in others_list:
+#                     #     print(element)
+#                     #     tuple = (selected_category,element)
+#                     tuple = (selected_category,
+#                              request.POST['other_category' + str(i)])
+#                     # print(request.POST['other_category' + str(i)])
+#                     # print(tuple)
+#                     # So here the correct_category will be needing a touple so the data will be like:
+#                     # [(selected_category1, selected_category2), (other_category1, other_category2)] This will be the output of the multi select
+#                     correct_category.append(tuple)
+#                 else:
+#                     # So here the correct_category will be needing a touple so the data will be like:
+#                     # [(selected_category1, selected_category2)] This will be the output of the multi select
+#                     correct_category.append(selected_category)
+#         csv = EditCsv(file_name, user_name, company)
+#         csv.write_file(correct_category)
+#         if request.POST['radio'] != "no":
+#             # If the user want to send the file to Google Drive
+#             path_folder = request.user.username + "/CSV/output/"
+#             path_file = 'MEDIA/' + request.user.username + \
+#                 "/CSV/output/" + request.session['filename']
+#             path_file_diff = 'MEDIA/' + request.user.username + "/CSV/output/Difference of " + request.session[
+#                 'filename']
+#             upload_to_google_drive.upload_to_drive(path_folder,
+#                                                    'results of ' +
+#                                                    request.session['filename'],
+#                                                    "Difference of " +
+#                                                    request.session['filename'],
+#                                                    path_file,
+#                                                    path_file_diff)
+#     return redirect("/download")
 
 
-def handle_uploaded_file(f, username, filename):
-    """Just a precautionary step if signals.py doesn't work for any reason."""
+# def file_download(request):
+#     if not request.user.is_authenticated:
+#         return redirect(settings.LOGIN_REDIRECT_URL)
+#     else:
+#         # Refer to the source: https://stackoverflow.com/questions/36392510/django-download-a-file/36394206
+#         path = os.path.join(settings.MEDIA_ROOT, request.user.username,
+#                             "CSV", "output", request.session['filename'])
+#         with open(path, 'rb') as csv:
+#             response = HttpResponse(
+#                 csv.read())  # Try using HttpStream instead of this. This method will create problem with large numbers of rows like 25k+
+#             response['Content-Type'] = 'application/force-download'
+#             response['Content-Disposition'] = 'attachment;filename=results of ' + \
+#                 request.session['filename']
+#         return response
 
-    data_directory_root = settings.MEDIA_ROOT
-    path = os.path.join(data_directory_root, username,
-                        "CSV", "input", filename)
-    path_input = os.path.join(data_directory_root, username, "CSV", "input")
-    path_output = os.path.join(data_directory_root, username, "CSV", "output")
 
-    if not os.path.exists(path_input):
-        os.makedirs(path_input)
+# def handle_uploaded_file(f, username, filename):
+#     """Just a precautionary step if signals.py doesn't work for any reason."""
 
-    if not os.path.exists(path_output):
-        os.makedirs(path_output)
+#     data_directory_root = settings.MEDIA_ROOT
+#     path = os.path.join(data_directory_root, username,
+#                         "CSV", "input", filename)
+#     path_input = os.path.join(data_directory_root, username, "CSV", "input")
+#     path_output = os.path.join(data_directory_root, username, "CSV", "output")
 
-    with open(path, 'wb+') as destination:
-        for chunk in f.chunks():
-            destination.write(chunk)
+#     if not os.path.exists(path_input):
+#         os.makedirs(path_input)
+
+#     if not os.path.exists(path_output):
+#         os.makedirs(path_output)
+
+#     with open(path, 'wb+') as destination:
+#         for chunk in f.chunks():
+#             destination.write(chunk)
 
 
 # def user_logout(request):
 #     logout(request)
-#     return redirect('login')
+#     return redirect(settings.LOGIN_REDIRECT_URL)
 
 
 class CategoryListView(LoginRequiredMixin, ListView):

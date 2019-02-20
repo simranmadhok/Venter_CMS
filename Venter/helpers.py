@@ -1,28 +1,15 @@
-"""Helper functions for the Venter app code"""
-import os
-from datetime import date
+"""Helper functions for Venter modules."""
 
-def get_file_upload_path(instance, filename):
-    """
-    Returns a custom MEDIA path for files uploaded by a user
-    Eg: /MEDIA/CSV Files/xyz/user1/2019-02-06/file1.csv
-    """
-    return os.path.join(
-        f'CSV Files/{instance.uploaded_by.profile.organisation_name}/{instance.uploaded_by.profile.user.username}/{instance.uploaded_date.date()}/{filename}')
-
-def get_organisation_logo_path(instance, filename):
-    """
-    Returns a custom MEDIA path for organisation logo uploaded by staff member
-    Eg: /MEDIA/Organisation Logo/xyz/2019-02-06/image1.png
-    """
-    return os.path.join(
-        f'Organisation Logo/{instance.organisation_name}/{date.today()}/{filename}')
+from django.contrib.auth.models import User
+from .models import Organisation, Profile
 
 
-def get_user_profile_picture_path(instance, filename):
-    """
-    Returns a custom MEDIA path for profile picture uploaded by user
-    Eg: /MEDIA/User Profile Picture/xyz/user1/2019-02-06/image2.png
-    """
-    return os.path.join(
-        f'User Profile Picture/{instance.organisation_name}/{instance.user.username}/{date.today()}/{filename}')
+def create_org():
+    """Helper function for creating organisations during tests."""
+    return Organisation.objects.create(organisation_name="Test Org")
+
+def create_profile():
+    """Helper function for creating test user and test profile."""
+    user = User.objects.create_user('Test')
+    org = create_org()
+    return Profile.objects.create(user=user, organisation_name=org)
