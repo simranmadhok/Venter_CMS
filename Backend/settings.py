@@ -24,8 +24,6 @@ SECRET_KEY = 'p!63vi=_4)o5h8k0ep4uy2e6ou^k$9wels#e&&x=^^!=$xa21o'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["https://venteriitb.azurewebsites.net", "*"]
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -118,9 +116,13 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, "MEDIA/")
 
 LOGIN_REDIRECT_URL = 'upload_csv'
+LOGIN_URL = 'login'
 
-EMAIL_BACKEND = "django.core.mail.backends.filebased.EmailBackend"
-EMAIL_FILE_PATH = os.path.join(BASE_DIR, "sent_emails")
+LOGOUT_REDIRECT_URL = 'login'
+
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+ADMINS = [('Test A. Admin', 'admin@test.com')]
 
 # Maximum size of file uploaded by user
 # 5242880 = 5 MB

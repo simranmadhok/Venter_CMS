@@ -61,12 +61,16 @@ class CSVForm(forms.ModelForm):
 
 
 class UserForm(forms.ModelForm):
+
     """
     Modelform, generated from Django's user model.
 
     Meta class------
         1) declares 'User' as the model class to generate the 'user_form'
         2) includes only five fields in the 'user_form' from the User model
+
+    Note------
+        CSS styling done per widget instance
 
     Usage------
         1) 'registration.html' template: Generates the user form fields in the signup page for new users
@@ -75,6 +79,11 @@ class UserForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ('username', 'password', 'email', 'first_name', 'last_name')
+    username = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Username'}))
+    password = forms.CharField(widget=forms.PasswordInput(attrs={'class':'form-control', 'placeholder':'Password'}))
+    email = forms.CharField(widget=forms.EmailInput(attrs={'class':'form-control', 'placeholder':'Email'}))
+    first_name = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'First Name'}))
+    last_name = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Last Name'}))
 
 class ProfileForm(forms.ModelForm):
     """

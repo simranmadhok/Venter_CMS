@@ -4,19 +4,19 @@ import re
 
 from django import forms
 from django.conf import settings
-from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import (LoginRequiredMixin,
                                         PermissionRequiredMixin)
-from django.contrib.auth.models import User
+from django.contrib.auth.models import Permission, User
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
-from django.core.mail import send_mail
+from django.core.mail import mail_admins
 from django.core.validators import validate_email
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect, render
 from django.urls import reverse, reverse_lazy
 from django.views import generic
+from django.views.decorators.cache import never_cache
 from django.views.generic.edit import CreateView, UpdateView
 from django.views.generic.list import ListView
 
@@ -28,6 +28,7 @@ from .manipulate_csv import EditCsv
 
 
 @login_required
+@never_cache
 def upload_csv_file(request):
     """
     View logic for uploading CSV file by a logged in user.
@@ -144,9 +145,9 @@ def handle_uploaded_file(f, username, filename):
             destination.write(chunk)
 
 
-def user_logout(request):
-    logout(request)
-    return redirect('login')
+# def user_logout(request):
+#     logout(request)
+#     return redirect('login')
 
 
 class CategoryListView(LoginRequiredMixin, ListView):
@@ -204,26 +205,31 @@ class RegisterEmployeeView(LoginRequiredMixin, CreateView):
         2) The profile.save() returns an instance of Profile that has been saved to the database.
             This occurs only after the profile is created for a new user with the 'profile.user = user'
         3) The validate_password() is an in-built password validator in Django
-        #module-django.contrib.auth.password_validation
+            #module-django.contrib.auth.password_validation
         Ref: https://docs.djangoproject.com/en/2.1/topics/auth/passwords/
+        4) The user_form instance is initialized again (user_form = UserForm()), for staff member
+            to register another employee after successful submission of previous form
     """
     model = User
 
     def post(self, request, *args, **kwargs):
         user_form = UserForm(request.POST)
         if user_form.is_valid():
-            userObj = user_form.save(commit=False)
+            user_obj = user_form.save(commit=False)
             password = user_form.cleaned_data.get('password')
             try:
-                validate_password(password, userObj)
-                userObj.set_password(password)
-                userObj.save()
+                validate_password(password, user_obj)
+                user_obj.set_password(password)
+                user_obj.save()
                 org_name = request.user.profile.organisation_name
                 profile = Profile.objects.create(
-                    user=userObj, organisation_name=org_name)
+                    user=user_obj, organisation_name=org_name)
                 profile.save()
-                # add alert message 'Registration successfull! with green tick mark symbol, then redirect to dashboard'
-                return HttpResponseRedirect(reverse('dashboard_staff'))
+                permission = Permission.objects.get(
+                    name='Can view files uploaded by self')
+                user_obj.user_permissions.add(permission)
+                user_form = UserForm()
+                return render(request, './Venter/registration.html', {'user_form': user_form, 'successful_submit': True})
             except ValidationError as e:
                 user_form.add_error('password', e)
                 return render(request, './Venter/registration.html', {'user_form': user_form})
@@ -314,14 +320,13 @@ def contact_us(request):
                 now = datetime.datetime.now()
                 print(now.strftime("%Y-%m-%d %H:%M"))
                 date_time = now.strftime("%Y-%m-%d %H:%M")
+                # prepare email body
                 email_body = "Dear Admin,\n\n Following are the inquiry details:\n\n " + \
                     "Inquiry Date and Time: "+date_time+"\n Company Name: " + \
                     company_name+"\n Contact Number: "+contact_no+"\n Email address: " + \
                     email+"\n Requirement Details: "+requirement_details+"\n\n"
-                print(email_body)
-
-                # use send_mail() to submit form details to the administrator
-                send_mail('Venter Inquiry', email_body, 'from@example.com', ['madhok.simran8@gmail.com'], fail_silently=False)
+                # email inquiry details to the administrator
+                mail_admins('Venter Inquiry', email_body)
                 return HttpResponse('<h3>Details submitted</h3>')
             else:
                 error_message = "Please enter a valid phone number"

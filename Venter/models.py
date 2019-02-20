@@ -63,7 +63,7 @@ class Profile(models.Model):
         blank=True,
         max_length=10,
         validators=[RegexValidator(
-            regex='^[6-9]\\d{9}$', message='Please enter a valid phone number')]
+            regex=r'^[6-9]\d{9}$', message='Please enter a valid phone number')]
     )
     def __str__(self):
         return self.user.username  # pylint: disable = E1101

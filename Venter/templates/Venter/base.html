@@ -14,19 +14,13 @@
     <!--     Fonts and icons     -->
     <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700,200" rel="stylesheet" />
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css" />
+    <!-- LINEARICONS -->
+    <link rel="stylesheet" href="../../static/assets/fonts/linearicons/style.css">
     <!-- CSS Files -->
     <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}" />
     <link href="../../static/assets/css/bootstrap.min.css" rel="stylesheet" />
     <link href="../../static/assets/css/light-bootstrap-dashboard.css?v=2.0.1" rel="stylesheet" />
-    <!-- CSS Just for demo purpose, don't include it in your project -->
-    <link href="../../static/assets/css/demo.css" rel="stylesheet" />
-    <script>
-            $(".nav li").on("click", function() {
-              $(".nav li").removeClass("active");
-              $(this).addClass("active");
-            });
-        
-        </script>
+
 </head>
 
 <body>
@@ -45,20 +39,20 @@
 
                     <ul class="nav navbar-nav">
                         {% if user.is_staff %}
-                        <li>
+                        <li class="dashboard-item">
                             <a class="nav-link" href="{% url 'dashboard_staff' %}">
                                 <i class="nc-icon nc-grid-45"></i>
                                 <p>Dashboard</p>
                             </a>
                         </li>
-                        <li>
+                        <li class="register-employee-item">
                             <a class="nav-link" href="{% url 'register_employee' %}">
                                 <i class="nc-icon nc-notes"></i>
-                                <p>Register</p>
+                                <p>Register Employee</p>
                             </a>
                         </li>
                         {% else %}
-                        <li >
+                        <li class="dashboard-item">
                             <a class="nav-link" href="{% url 'dashboard_user' request.user.pk %}">
                                 <i class="nc-icon nc-grid-45"></i>
                                 <p>Dashboard</p>
@@ -66,28 +60,28 @@
                         </li>
                         {% endif %}
 
-                        <li class="active">
+                        <li class="upload-csv-item">
                             <a class="nav-link" href="{% url 'upload_csv' %}">
                                 <i class="nc-icon nc-simple-add"></i>
                                 <p>Upload CSV</p>
                             </a>
                         </li>
-                        <li>
+                        <li class="user-profile-item">
                             <a class="nav-link" href="{% url 'update_profile' request.user.pk %}">
                                 <i class="nc-icon nc-circle-09"></i>
                                 <p>User Profile</p>
                             </a>
                         </li>
-                        <li>
+                        <li class="category-list-item">
                             <a class="nav-link" href="{% url 'category_list' request.user %}">
                                 <i class="nc-icon nc-bullet-list-67"></i>
                                 <p>Category List</p>
                             </a>
                         </li>
-                        <li>
                         <li class="nav-item active active-pro">
                             <a class="nav-link active" href="{% url 'logout' %}">
-                                <i class="nc-icon nc-stre-right"></i>
+                                <i class="nc-icon nc-button-power"></i>
+                                <!-- <span class="lnr lnr-exit"></span> -->
                                 <p>Log out</p>
                             </a>
                         </li>
