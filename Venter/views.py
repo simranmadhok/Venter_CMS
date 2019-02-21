@@ -12,12 +12,12 @@ from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.core.mail import mail_admins
 from django.core.validators import validate_email
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse
 from django.shortcuts import redirect, render
-from django.urls import reverse, reverse_lazy
+from django.urls import reverse_lazy
 from django.views import generic
 from django.views.decorators.cache import never_cache
-from django.views.generic.edit import CreateView, UpdateView
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic.list import ListView
 
 from Venter import upload_to_google_drive
@@ -36,7 +36,8 @@ def upload_csv_file(request):
     For POST request-------
         1) The POST data, uploaded csv file and a request parameter are being sent to CSVForm as arguments
         2) If form.is_valid() returns true, the user is assigned to the uploaded_by field
-        3) csv_form is saved and currently returns a simple httpresponse inplace of prediction results
+        3) csv_form is saved and Form instance is initialized again (csv_form = CSVForm(request=request)),
+           for user to upload another file after successfully uploading the previous file
     For GET request-------
         The csv_form is rendered in the template
     """
@@ -45,13 +46,9 @@ def upload_csv_file(request):
         if csv_form.is_valid():
             file_uploaded = csv_form.save(commit=False)
             file_uploaded.uploaded_by = request.user
-            csv_form.save()
-            if request.user.is_staff:
-                return HttpResponseRedirect(reverse('dashboard_staff'))
-            else:
-                return HttpResponseRedirect(reverse('dashboard_user', args=(request.user.pk,)))
-        else:
-            return render(request, './Venter/upload_file.html', {'csv_form': csv_form})
+            file_uploaded.save()
+            csv_form = CSVForm(request=request)
+            return render(request, './Venter/upload_file.html', {'csv_form': csv_form, 'successful_submit': True})
     elif request.method == 'GET':
         csv_form = CSVForm(request=request)
         return render(request, './Venter/upload_file.html', {'csv_form': csv_form})
@@ -144,12 +141,6 @@ def handle_uploaded_file(f, username, filename):
         for chunk in f.chunks():
             destination.write(chunk)
 
-
-# def user_logout(request):
-#     logout(request)
-#     return redirect('login')
-
-
 class CategoryListView(LoginRequiredMixin, ListView):
     """
     Arguments------
@@ -182,13 +173,12 @@ class UpdateProfileView(LoginRequiredMixin, UpdateView):
             request.POST, request.FILES, instance=request.user.profile)
         if profile_form.is_valid():
             profile_form.save()
-            # add alert message 'Profile details updated! with green tick mark symbol, then redirect to dashboard'
-            if request.user.is_staff:
-                return HttpResponseRedirect(reverse('dashboard_staff'))
-            else:
-                return HttpResponseRedirect(reverse('dashboard_user', args=(request.user.pk,)))
+            profile_form = ProfileForm(instance=request.user.profile)
+            return render(request, './Venter/update_profile.html',
+                          {'profile_form': profile_form, 'successful_submit': True})
         else:
-            return render(request, './Venter/update_profile.html', {'profile_form': profile_form})
+            return render(request, './Venter/update_profile.html',
+                          {'profile_form': profile_form})
 
     def get(self, request, *args, **kwargs):
         profile_form = ProfileForm(instance=request.user.profile)
@@ -222,12 +212,12 @@ class RegisterEmployeeView(LoginRequiredMixin, CreateView):
                 user_obj.set_password(password)
                 user_obj.save()
                 org_name = request.user.profile.organisation_name
-                profile = Profile.objects.create(
-                    user=user_obj, organisation_name=org_name)
-                profile.save()
                 permission = Permission.objects.get(
                     name='Can view files uploaded by self')
                 user_obj.user_permissions.add(permission)
+                profile = Profile.objects.create(
+                    user=user_obj, organisation_name=org_name)
+                profile.save()
                 user_form = UserForm()
                 return render(request, './Venter/registration.html', {'user_form': user_form, 'successful_submit': True})
             except ValidationError as e:
@@ -327,7 +317,8 @@ def contact_us(request):
                     email+"\n Requirement Details: "+requirement_details+"\n\n"
                 # email inquiry details to the administrator
                 mail_admins('Venter Inquiry', email_body)
-                return HttpResponse('<h3>Details submitted</h3>')
+                return render(request, './Venter/contact_us.html', {
+                    'successful_submit': True})
             else:
                 error_message = "Please enter a valid phone number"
                 return render(request, './Venter/contact_us.html', {
@@ -338,3 +329,25 @@ def contact_us(request):
                 'error_message': error_message})
     elif request.method == 'GET':
         return render(request, './Venter/contact_us.html')
+
+class FileDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
+    """
+    Arguments------
+        1) LoginRequiredMixin: View to redirect non-authenticated users to show HTTP 403 error
+        2) PermissionRequiredMixin: View to check whether the user is a staff
+        having permission to delete organisation files
+        3) DeletView: View to delete the files uploaded by user(s)/staff member(s) of the organisation
+
+    Functions------
+        1) get_queryset(): Returns a new QuerySet filtering files uploaded by the logged-in user
+    """
+    permission_required = 'Venter.delete_organisation_files'
+    model = File
+    success_url = reverse_lazy('dashboard_staff')
+
+    def get(self, request, *args, **kwargs):
+        return self.post(request, *args, **kwargs)
+
+def predict_result(request):
+    if request.method == 'GET':
+        return render(request, './Venter/prediction_result.html')

@@ -2,6 +2,8 @@
 {% block title %}Dashboard{% endblock %}
 {% block content %}
 
+<link rel="stylesheet" href="../../static/assets/css/dashboard_staff.css">
+    
 {% if file_list %}
 <br><br>
 <a href="{% url 'upload_csv' %}"><button type="button" class="btn btn-primary" style="float: right"><span class="glyphicon glyphicon-plus"></span>&nbsp;&nbsp;Upload CSV File</button></a>
@@ -23,9 +25,9 @@
             <td style="font-family: 'Times New Roman'">{{ file.filename }}</td>
             <td style="font-family: 'Times New Roman'">{{ file.uploaded_date.date }}</td>
             <td style="font-family: 'Times New Roman'">{{ file.uploaded_date.astimezone.time }}</td>
-            <td style="font-family: 'Times New Roman'"><button class="btn btn-success">Predict</button></td>
+            <td style="font-family: 'Times New Roman'"><a href="{% url 'predict_result' %}"><button class="btn btn-success">Predict</button></a></td>
             <td style="font-family: 'Times New Roman'">{{ file.uploaded_by}}</td>
-            <td style="font-family: 'Times New Roman'"><button class="btn btn-danger">Delete</button></td>
+            <td style="font-family: 'Times New Roman'"><a href="{% url 'delete_file' file.pk %}"><button class="btn btn-danger">Delete</button></a></td>
         </tr>
         {% endfor %}
     </tbody>
@@ -34,4 +36,5 @@
 <h3 style="font-family: 'Times New Roman';">No files available</h3>
 <a href="{% url 'upload_csv' %}"><button type="button" class="btn btn-primary" style="float: center;"><span class="glyphicon glyphicon-plus"></span>&nbsp;&nbsp;Upload CSV File</button></a>
 {% endif %}
+
 {% endblock %}

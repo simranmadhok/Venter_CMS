@@ -2,6 +2,21 @@
 {% block title %}Contact Us{% endblock %}
 {% block content %}
 
+<!-- LINEARICONS -->
+<link rel="stylesheet" href="../../static/assets/fonts/linearicons/style.css">
+<script src="../../static/assets/js/jquery-3.3.1.min.js"></script>
+<script src="../../static/assets/js/main.js"></script>
+<link rel="stylesheet" href="../../static/assets/css/contact_us.css">
+
+{% if successful_submit %}
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#contactUsModal").modal('show');
+    });
+</script>
+{% endif %} 
+
+
 <form method="post"  action="{% url 'contact_us' %}" enctype="multipart/form-data">
     {% csrf_token %}
     
@@ -19,5 +34,33 @@
 {% if error_message %}
   <p style="color:red;">{{ error_message }}</p>
 {% endif %}
+
+<!--Modal -->
+<div class="modal fade" id="contactUsModal" tabindex="-1" role="dialog" aria-labelledby="contactUsModalTitle"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <div class="text-center">
+                    <img src="../../static/assets/img/phone_logo.png" alt="" class="phone_logo-contact">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="footer-center">
+                    <p class="p1-contact">Thank you for contacting us!</p>
+                        <p class="p2-contact">Your inquiry was submitted and will be responded to as soon as possible.</p><br>
+                    <a href="{% url 'home' %}">
+                        <button type="button" class="btn btn-warning rounded-4">
+                            Explore more &nbsp;&nbsp; <span class="lnr lnr-home"></span>
+                        </button>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 {% endblock %}
