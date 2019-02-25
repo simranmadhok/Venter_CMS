@@ -32,7 +32,11 @@ urlpatterns = [
     path('dashboard_staff/', views.FilesByOrganisationListView.as_view(), name='dashboard_staff'),
     # ex: /venter/contact_us/
     path('contact_us/', views.contact_us, name='contact_us'),
+    # ex: /venter/search_category/
+    path('search_category/', views.CategorySearchView.as_view(), name='search_category'),
+    # ex: /venter/search_file/
+    path('search_file/', views.FileSearchView.as_view(), name='search_file'),
     # ex: /venter/predict_result/
-    path('predict_result/', views.predict_result, name='predict_result'),
+    path('predict_result/<int:pk>', views.predict_result, name='predict_result'),
     path('predict/checkOutput/', views.handle_user_selected_data, name='checkOutput'),
 ]

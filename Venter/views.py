@@ -1,8 +1,8 @@
 import datetime
+import operator
 import os
-import re
+from functools import reduce
 
-from django import forms
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import (LoginRequiredMixin,
@@ -11,17 +11,17 @@ from django.contrib.auth.models import Permission, User
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.core.mail import mail_admins
-from django.core.validators import validate_email
+from django.db.models import Q
 from django.http import HttpResponse
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.views import generic
 from django.views.decorators.cache import never_cache
-from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.views.generic.list import ListView
 
 from Venter import upload_to_google_drive
-from Venter.forms import CSVForm, ProfileForm, UserForm
+from Venter.forms import ContactForm, CSVForm, ProfileForm, UserForm
 from Venter.models import Category, File, Profile
 
 from .manipulate_csv import EditCsv
@@ -48,10 +48,12 @@ def upload_csv_file(request):
             file_uploaded.uploaded_by = request.user
             file_uploaded.save()
             csv_form = CSVForm(request=request)
-            return render(request, './Venter/upload_file.html', {'csv_form': csv_form, 'successful_submit': True})
+            return render(request, './Venter/upload_file.html', {
+                'csv_form': csv_form, 'successful_submit': True})
     elif request.method == 'GET':
         csv_form = CSVForm(request=request)
-        return render(request, './Venter/upload_file.html', {'csv_form': csv_form})
+        return render(request, './Venter/upload_file.html', {
+            'csv_form': csv_form})
 
 
 def handle_user_selected_data(request):
@@ -153,6 +155,7 @@ class CategoryListView(LoginRequiredMixin, ListView):
         based on the organisation name passed in the parameter.
     """
     model = Category
+    paginate_by = 12
 
     def get_queryset(self):
         return Category.objects.filter(organisation_name=self.request.user.profile.organisation_name)
@@ -265,6 +268,7 @@ class FilesByOrganisationListView(LoginRequiredMixin, PermissionRequiredMixin, g
     template_name = './Venter/dashboard_staff.html'
     context_object_name = 'file_list'
     permission_required = 'Venter.view_organisation_files'
+    paginate_by = 5
 
     def get_queryset(self):
         """
@@ -287,48 +291,38 @@ def contact_us(request):
     The contact details are submitted through the 'contact_us' template form.
 
     For POST request-------
-        The contact details of an organisation are collected in the form.
-        The email and phone number validation is performed.
-        The formd details are packed together in the body of the email.
-        An email is sent to the website administrator.
+        The contact details of an organisation are collected in the ContactForm.
+        If the form is valid, an email is sent to the website administrator.
     For GET request-------
         The contact_us template is rendered
     """
-    if request.method == 'POST':
-        company_name = request.POST.get('company_name')
-        contact_no = request.POST.get('contact_no')
-        email = request.POST.get('email')
-        requirement_details = request.POST.get('requirement_details')
+    contact_form = ContactForm()
 
-        try:
-            # validate email address
-            validate_email(email)
-            # validate contact number with regex expression
-            pattern = re.compile('^[6-9]\\d{9}$')
-            if bool(pattern.match(contact_no)):
-                # get current date and time
-                now = datetime.datetime.now()
-                print(now.strftime("%Y-%m-%d %H:%M"))
-                date_time = now.strftime("%Y-%m-%d %H:%M")
-                # prepare email body
-                email_body = "Dear Admin,\n\n Following are the inquiry details:\n\n " + \
-                    "Inquiry Date and Time: "+date_time+"\n Company Name: " + \
-                    company_name+"\n Contact Number: "+contact_no+"\n Email address: " + \
-                    email+"\n Requirement Details: "+requirement_details+"\n\n"
-                # email inquiry details to the administrator
-                mail_admins('Venter Inquiry', email_body)
-                return render(request, './Venter/contact_us.html', {
-                    'successful_submit': True})
-            else:
-                error_message = "Please enter a valid phone number"
-                return render(request, './Venter/contact_us.html', {
-                    'error_message': error_message})
-        except forms.ValidationError:
-            error_message = "Please enter a valid email address"
+    if request.method == 'POST':
+        contact_form = ContactForm(request.POST)
+        if contact_form.is_valid():
+            company_name = contact_form.cleaned_data.get('company_name')
+            contact_no = contact_form.cleaned_data.get('contact_no')
+            email_address = contact_form.cleaned_data.get('email_address')
+            requirement_details = contact_form.cleaned_data.get('requirement_details')
+
+            # get current date and time
+            now = datetime.datetime.now()
+            date_time = now.strftime("%Y-%m-%d %H:%M")
+
+            # prepare email body
+            email_body = "Dear Admin,\n\n Following are the inquiry details:\n\n " + \
+                "Inquiry Date and Time: "+date_time+"\n Company Name: " + \
+                company_name+"\n Contact Number: "+contact_no+"\n Email address: " + \
+                email_address+"\n Requirement Details: "+requirement_details+"\n\n"
+            mail_admins('Venter Inquiry', email_body)
+            # contact_form.save()
+            contact_form = ContactForm()
             return render(request, './Venter/contact_us.html', {
-                'error_message': error_message})
-    elif request.method == 'GET':
-        return render(request, './Venter/contact_us.html')
+                'contact_form': contact_form, 'successful_submit': True})
+    return render(request, './Venter/contact_us.html', {
+        'contact_form': contact_form,
+    })
 
 class FileDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     """
@@ -348,6 +342,42 @@ class FileDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     def get(self, request, *args, **kwargs):
         return self.post(request, *args, **kwargs)
 
-def predict_result(request):
+def predict_result(request, pk):
     if request.method == 'GET':
+        # file_instance = get_object_or_404(File, pk=pk)
+        # make api call
+        # retrieve domain names
+        # for each domain retrieve category names
+        # for each category retrieve responses names
         return render(request, './Venter/prediction_result.html')
+
+
+class CategorySearchView(CategoryListView):
+    paginate_by = 3
+
+    def get_queryset(self):
+        result = super(CategorySearchView, self).get_queryset()
+
+        query = self.request.GET.get('q')
+        if query:
+            query_list = query.split()
+            result = result.filter(
+                reduce(operator.and_,
+                       (Q(category__icontains=q) for q in query_list))
+            )
+        return result
+
+class FileSearchView(FilesByOrganisationListView):
+    paginate_by = 3
+
+    def get_queryset(self):
+        result = super(FilesByOrganisationListView, self).get_queryset()
+
+        query = self.request.GET.get('q')
+        if query:
+            query_list = query.split()
+            result = result.filter(
+                reduce(operator.and_,
+                       (Q(csv_file__icontains=q) for q in query_list))
+            )
+        return result
