@@ -18,16 +18,18 @@ from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.views import generic
 from django.views.decorators.cache import never_cache
+from django.views.decorators.http import require_http_methods
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.views.generic.list import ListView
 
+import jsonpickle
 from Venter import upload_to_google_drive
 from Venter.forms import ContactForm, CSVForm, ProfileForm, UserForm
 from Venter.models import Category, File, Profile
 
 from .manipulate_csv import EditCsv
 from .ML_model.Civis.modeldriver import SimilarityMapping
-from django.views.decorators.http import require_http_methods
+
 
 @login_required
 @never_cache
@@ -107,22 +109,6 @@ def handle_user_selected_data(request):
                                                    path_file,
                                                    path_file_diff)
     return redirect("/download")
-
-
-def file_download(request):
-    if not request.user.is_authenticated:
-        return redirect(settings.LOGIN_REDIRECT_URL)
-    else:
-        # Refer to the source: https://stackoverflow.com/questions/36392510/django-download-a-file/36394206
-        path = os.path.join(settings.MEDIA_ROOT, request.user.username,
-                            "CSV", "output", request.session['filename'])
-        with open(path, 'rb') as csv:
-            response = HttpResponse(
-                csv.read())  # Try using HttpStream instead of this. This method will create problem with large numbers of rows like 25k+
-            response['Content-Type'] = 'application/force-download'
-            response['Content-Disposition'] = 'attachment;filename=results of ' + \
-                request.session['filename']
-        return response
 
 
 def handle_uploaded_file(f, username, filename):
@@ -270,7 +256,7 @@ class FilesByOrganisationListView(LoginRequiredMixin, PermissionRequiredMixin, g
     template_name = './Venter/dashboard_staff.html'
     context_object_name = 'file_list'
     permission_required = 'Venter.view_organisation_files'
-    paginate_by = 5
+    paginate_by = 10
 
     def get_queryset(self):
         """
@@ -312,7 +298,7 @@ def contact_us(request):
             # get current date and time
             now = datetime.datetime.now()
             date_time = now.strftime("%Y-%m-%d %H:%M")
-
+    
             # prepare email body
             email_body = "Dear Admin,\n\n Following are the inquiry details:\n\n " + \
                 "Inquiry Date and Time: "+date_time+"\n Company Name: " + \
@@ -363,8 +349,8 @@ class CategorySearchView(CategoryListView):
         return result
 
 
-class FileSearchView(FilesByOrganisationListView):
-    paginate_by = 3
+class OrganisationFileSearchView(FilesByOrganisationListView):
+    paginate_by = 5
 
     def get_queryset(self):
         result = super(FilesByOrganisationListView, self).get_queryset()
@@ -379,31 +365,64 @@ class FileSearchView(FilesByOrganisationListView):
         return result
 
 
+class UserFileSearchView(FilesByUserListView):
+    paginate_by = 3
+
+    def get_queryset(self):
+        result = super(FilesByUserListView, self).get_queryset()
+
+        query = self.request.GET.get('q')
+        if query:
+            query_list = query.split()
+            result = result.filter(
+                reduce(operator.and_,
+                       (Q(csv_file__icontains=q) for q in query_list))
+            )
+        return result
+        
+
+dict_data = {}
+domain_list = []
+
 @require_http_methods(["GET",])
 def predict_result(request, pk):
+        global dict_data, domain_list
         # pass xlsx file instance to SimilarityMapping instead of the file path
 
-        path_to_file = os.path.join(settings.MEDIA_ROOT, 'Responses_All About the RMP2031.xlsx')
-        sm = SimilarityMapping(path_to_file)
-        sm.driver()
+        # path_to_file = os.path.join(settings.MEDIA_ROOT, 'Responses_All About the RMP2031.xlsx')
+        # sm = SimilarityMapping(path_to_file)
+        # sm.driver()
 
-        path = os.path.join(settings.MEDIA_ROOT, 'out_test1.json')  
-        # path = os.path.join(settings.MEDIA_ROOT, 'Output Result Files', 'SpeakUp', 'test_admin_speakup', '2019-02-26', 'result.json')  
+        path = os.path.join(settings.MEDIA_ROOT, 'out.json')
         json_data = open(path)
-        dict_data = json.load(json_data)  # deserialises it
-
-        dict_keys = dict_data.keys()  # retrieve keys
+        dict_data = json.load(json_data)
+        print(type(dict_data))
+        dict_keys = dict_data.keys()
         domain_list = list(dict_keys)
-
-        traffic_data = dict_data['Traffic']
-
-        for category in traffic_data.keys():
-            print("-----CAT-----")
-            print(category)
-            for response in traffic_data[category]:
-                print("======RES=======")
-                print (response)
 
         return render(request, './Venter/prediction_result.html', {
             'domain_list': domain_list, 'dict_data': dict_data
         })
+
+
+@require_http_methods(["GET", ])
+def domain_contents(request):
+    global domain_list
+    domain_stats = [['Category', 'Number of Responses']]
+    domain_name = request.GET.get('domain')
+    domain_data = dict_data[domain_name]
+
+    for category, responselist in domain_data.items():
+            domain_stats.append([category, len(responselist)])
+
+    return render(request, './Venter/prediction_result.html', {
+        'domain_data': domain_data, 'domain_list': domain_list, 'domain_stats': jsonpickle.encode(domain_stats)
+    })
+
+
+# def file_download(request, pk):
+#     input_file = File.objects.get(pk=pk)
+# book_instance = get_object_or_404(BookInstance, pk=pk)
+#     book_instance.status = STATUS_AVAILABLE
+#     book_instance.save()
+    

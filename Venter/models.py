@@ -58,6 +58,7 @@ class Profile(models.Model):
         upload_to=get_user_profile_picture_path,
         null=True,
         blank=True,
+        default='User Profile Picture/default-avatar.png'
     )
     phone_number = models.CharField(
         blank=True,
@@ -145,7 +146,7 @@ class File(models.Model):
         return os.path.basename(self.csv_file.name)  # pylint: disable = E1101
 
     class Meta:
-        verbose_name_plural = 'CSV File'
+        verbose_name_plural = 'File'
         permissions = (
             ("view_organisation_files", "Can view organisation files"),
             ("view_self_files", "Can view files uploaded by self"),

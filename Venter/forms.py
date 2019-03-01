@@ -108,19 +108,18 @@ class ProfileForm(forms.ModelForm):
 
 class ContactForm(forms.Form):
     company_name = forms.CharField(widget=forms.TextInput(
-        attrs={'class': 'form-control', 'placeholder': 'Company Name'}), required=True)
+        attrs={'class': 'form-control'}), required=True)
     email_address = forms.EmailField(widget=forms.EmailInput(
-        attrs={'class': 'form-control', 'placeholder': 'Email'}), required=True)
+        attrs={'class': 'form-control'}), required=True)
     contact_no = forms.CharField(widget=forms.TextInput(
-        attrs={'class': 'form-control', 'placeholder': 'Contact Number'}), required=True, max_length=10)
+        attrs={'class': 'form-control'}), required=True, max_length=10)
     requirement_details = forms.CharField(widget=forms.Textarea(
-        attrs={'class': 'form-control', 'placeholder': 'Requirement'}), required=True)
+        attrs={'class': 'form-control'}), required=True)
 
     def clean(self):
         """
         It validates specific attributes of 'contact_form' field: email, contact_no.
         """
-        # (ContactForm, self).clean()
         email_address = self.cleaned_data.get('email_address')
         contact_no = self.cleaned_data.get('contact_no')
 
@@ -131,7 +130,3 @@ class ContactForm(forms.Form):
             else:
                 raise forms.ValidationError(
                     "Please enter a valid phone number")
-        # else:
-        #     raise forms.ValidationError(
-        #         "Please enter a valid email address")
-        # return self.cleaned_data

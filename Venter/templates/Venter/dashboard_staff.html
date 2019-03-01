@@ -5,12 +5,13 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <link rel="stylesheet" href="../../static/assets/css/dashboard_staff.css">
 
+
 <div class="outer-db">
   {% if file_list %}
   <div class="inner-db-file">
     <div class="row">
       <div class="col-sm-9">
-        <form action="{% url 'search_file' %}" method="get">
+        <form action="{% url 'search_organisation_files' %}" method="get">
             <div class="form-group row">
                 <div class="col-sm-1">
                   <input type="submit" value="Search" class="btn btn-primary active">
@@ -50,7 +51,7 @@
           <td>{{ file.uploaded_date.astimezone.time }}</td>
           <td>
             <a href="{% url 'predict_result' file.pk %}">
-              <button class="btn btn-success predict-button">Predict</button>
+              <button class="btn btn-success predict-button">Categorize</button>
             </a>
           </td>
           <td>

@@ -22,8 +22,6 @@ urlpatterns = [
     path('upload_csv/', views.upload_csv_file, name='upload_csv'),
     # ex: /venter/delete_file/5/
     path('delete_file/<int:pk>', views.FileDeleteView.as_view(), name='delete_file'),
-    # ex: /venter/download/
-    path('download/', views.file_download, name='download_file'),
     # ex: /venter/category_list/civis/
     path('category_list/<organisation_name>', views.CategoryListView.as_view(), name='category_list'),
     # ex: /venter/dashboard_user/5/
@@ -34,9 +32,15 @@ urlpatterns = [
     path('contact_us/', views.contact_us, name='contact_us'),
     # ex: /venter/search_category/
     path('search_category/', views.CategorySearchView.as_view(), name='search_category'),
-    # ex: /venter/search_file/
-    path('search_file/', views.FileSearchView.as_view(), name='search_file'),
+    # ex: /venter/search_organisation_files/
+    path('search_organisation_files/', views.OrganisationFileSearchView.as_view(), name='search_organisation_files'),
+    # ex: /venter/search_user_files/
+    path('search_user_files/', views.UserFileSearchView.as_view(), name='search_user_files'),
     # ex: /venter/predict_result/
     path('predict_result/<int:pk>', views.predict_result, name='predict_result'),
+    # ex: /venter/domain_contents/
+    path('domain_contents/', views.domain_contents, name='domain_contents'),
     path('predict/checkOutput/', views.handle_user_selected_data, name='checkOutput'),
+    # ex: /venter/download_file/5/
+    # path('download_file/<int:pk>', views.file_download, name='download_file'),
 ]
